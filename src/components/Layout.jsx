@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import { useSimulator } from '../context/SimulatorContext';
 
 export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { maxUnlockedStep, unlockUpTo } = useSimulator();
 
   // Map route to step number for quick jump selector and sidebar state
   const getStepFromPath = (pathname) => {
@@ -34,6 +36,17 @@ export default function Layout() {
   };
 
   const currentStep = getStepFromPath(location.pathname);
+
+  // When visiting a valid step, unlock up to this step
+  useEffect(() => {
+    if (currentStep > maxUnlockedStep) {
+      // If user directly typed URL of a future step they haven't unlocked yet, redirect to their max unlocked step
+      const targetPath = maxUnlockedStep === 1 ? '/' : `/paso-${maxUnlockedStep}`;
+      navigate(targetPath, { replace: true });
+    } else {
+      unlockUpTo(currentStep);
+    }
+  }, [currentStep, maxUnlockedStep, navigate, unlockUpTo]);
 
   const navigateToStep = (step) => {
     if (step === 1) navigate('/');

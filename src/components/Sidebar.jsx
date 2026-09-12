@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useSimulator } from '../context/SimulatorContext';
 
 const NAV_ITEMS = [
   {
@@ -108,6 +109,7 @@ const NAV_ITEMS = [
 export default function Sidebar({ currentStep = 1 }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { maxUnlockedStep } = useSimulator();
 
   const isItemActive = (item) => {
     if (currentStep) {
@@ -141,26 +143,45 @@ export default function Sidebar({ currentStep = 1 }) {
         <nav className="space-y-1.5 font-medium text-xs">
           {NAV_ITEMS.map((item) => {
             const active = isItemActive(item);
+            const isUnlocked = item.step <= maxUnlockedStep;
+
             return (
               <button
                 key={item.id}
-                onClick={() => navigate(item.path)}
-                className={`w-full text-left flex items-center space-x-2.5 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer ${
-                  active
-                    ? 'bg-white text-[#ff5500] font-bold shadow-md shadow-black/10 translate-x-1'
-                    : 'text-white/85 hover:text-white hover:bg-white/10'
+                disabled={!isUnlocked}
+                onClick={() => {
+                  if (isUnlocked) navigate(item.path);
+                }}
+                className={`w-full text-left flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200 ${
+                  !isUnlocked
+                    ? 'opacity-40 cursor-not-allowed bg-black/5 text-white/60'
+                    : active
+                    ? 'bg-white text-[#ff5500] font-bold shadow-md shadow-black/10 translate-x-1 cursor-pointer'
+                    : 'text-white/90 hover:text-white hover:bg-white/10 cursor-pointer'
                 }`}
               >
-                <span
-                  className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                    active ? 'bg-[#ff5500] text-white' : 'bg-white/15 text-white'
-                  }`}
-                >
-                  {item.step}
-                </span>
-                <span className="text-[13px] tracking-tight truncate font-semibold">
-                  {item.label.replace(/^\d+\.\s*/, '')}
-                </span>
+                <div className="flex items-center space-x-2.5 truncate">
+                  <span
+                    className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+                      active
+                        ? 'bg-[#ff5500] text-white'
+                        : isUnlocked
+                        ? 'bg-white/20 text-white'
+                        : 'bg-black/15 text-white/60'
+                    }`}
+                  >
+                    {item.step}
+                  </span>
+                  <span className="text-[13px] tracking-tight truncate font-semibold">
+                    {item.label.replace(/^\d+\.\s*/, '')}
+                  </span>
+                </div>
+
+                {!isUnlocked && (
+                  <svg className="w-3.5 h-3.5 text-white/50 flex-shrink-0 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                )}
               </button>
             );
           })}

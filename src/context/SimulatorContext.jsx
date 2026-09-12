@@ -9,6 +9,11 @@ export function SimulatorProvider({ children }) {
   const [currentFloorView, setCurrentFloorView] = useState('Primer piso');
   const [placedElements, setPlacedElements] = useState([]);
   const [placedWalls, setPlacedWalls] = useState([]); // [{ id, x, y, w, h, orientation: 'horizontal'|'vertical', type: 'concreto'|'drywall'|'vidrio' }]
+  const [maxUnlockedStep, setMaxUnlockedStep] = useState(1);
+
+  const unlockUpTo = (step) => {
+    setMaxUnlockedStep((prev) => Math.max(prev, step));
+  };
 
   return (
     <SimulatorContext.Provider
@@ -25,6 +30,9 @@ export function SimulatorProvider({ children }) {
         setPlacedElements,
         placedWalls,
         setPlacedWalls,
+        maxUnlockedStep,
+        setMaxUnlockedStep,
+        unlockUpTo,
       }}
     >
       {children}
