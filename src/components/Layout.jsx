@@ -39,14 +39,8 @@ export default function Layout() {
 
   // When visiting a valid step, unlock up to this step
   useEffect(() => {
-    if (currentStep > maxUnlockedStep) {
-      // If user directly typed URL of a future step they haven't unlocked yet, redirect to their max unlocked step
-      const targetPath = maxUnlockedStep === 1 ? '/' : `/paso-${maxUnlockedStep}`;
-      navigate(targetPath, { replace: true });
-    } else {
-      unlockUpTo(currentStep);
-    }
-  }, [currentStep, maxUnlockedStep, navigate, unlockUpTo]);
+    unlockUpTo(currentStep);
+  }, [currentStep, unlockUpTo]);
 
   const navigateToStep = (step) => {
     if (step === 1) navigate('/');

@@ -1,8 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSimulator } from '../context/SimulatorContext';
 
 export default function Principal() {
   const navigate = useNavigate();
+  const { unlockUpTo } = useSimulator();
+
+  const handleStart = () => {
+    unlockUpTo(2);
+    navigate('/paso-2');
+  };
 
   return (
     <article className="step-view flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full px-2 sm:px-6 lg:px-8 py-4 md:py-6" id="step-view-1">
@@ -22,7 +29,7 @@ export default function Principal() {
 
           <div className="pt-2">
             <button
-              onClick={() => navigate('/paso-2')}
+              onClick={handleStart}
               className="inline-flex items-center justify-center space-x-2.5 px-9 py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-base group"
             >
               <span>Comenzar</span>
