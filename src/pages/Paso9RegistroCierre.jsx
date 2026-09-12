@@ -7,13 +7,13 @@ export default function Paso9RegistroCierre() {
   const { selectedFloors, houseWidth, houseLength } = useSimulator();
 
   return (
-    <article className="step-view flex-1 flex flex-col justify-between" id="step-view-9">
+    <article className="step-view flex-1 flex flex-col justify-between max-w-6xl mx-auto w-full px-2 sm:px-4 py-2" id="step-view-8">
       <div>
         <div className="flex items-center space-x-3 mb-6">
-          <span className="w-8 h-8 rounded-full bg-win-500 text-white font-bold flex items-center justify-center text-sm shadow-sm">
-            9
+          <span className="w-9 h-9 rounded-full bg-[#ff5500] text-white font-extrabold flex items-center justify-center text-base shadow-sm">
+            8
           </span>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Registro de datos y cierre</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Registro de datos y cierre</h1>
         </div>
 
         {/* Success Checkmark Banner */}
@@ -82,10 +82,10 @@ export default function Paso9RegistroCierre() {
 
       <div className="flex justify-start mt-12 pt-6 border-t border-slate-100">
         <button
-          className="px-6 py-3 border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold rounded-full transition cursor-pointer"
-          onClick={() => navigate('/paso-8')}
+          className="px-6 py-3 border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold rounded-full transition cursor-pointer text-sm"
+          onClick={() => navigate('/paso-7')}
         >
-          Atrás
+          Atrás (Diagnóstico)
         </button>
       </div>
     </article>

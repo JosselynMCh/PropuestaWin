@@ -73,31 +73,9 @@ const NAV_ITEMS = [
   },
   {
     step: 7,
-    id: 'ajustes-mesh',
-    label: '7. Ajustes y Mesh',
-    path: '/paso-7',
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-      </svg>
-    ),
-  },
-  {
-    step: 8,
-    id: 'diagnostico',
-    label: '8. Diagnóstico',
-    path: '/paso-8',
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-    ),
-  },
-  {
-    step: 9,
     id: 'propuesta',
-    label: '9. Propuesta Final',
-    path: '/paso-9',
+    label: '7. Propuesta Final',
+    path: '/paso-7',
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -124,7 +102,7 @@ export default function Sidebar({ currentStep = 1 }) {
       data-purpose="vertical-navigation-sidebar"
     >
       <div>
-        {/* WIN Brandmark matching screenshot */}
+        {/* WIN Brandmark */}
         <div
           className="mb-5 pt-1 cursor-pointer flex items-center justify-between group"
           onClick={() => navigate('/')}
@@ -139,7 +117,7 @@ export default function Sidebar({ currentStep = 1 }) {
           </span>
         </div>
 
-        {/* Step Navigation for Every Step */}
+        {/* Step Navigation for Every Step (1 to 7) */}
         <nav className="space-y-1.5 font-medium text-xs">
           {NAV_ITEMS.map((item) => {
             const active = isItemActive(item);

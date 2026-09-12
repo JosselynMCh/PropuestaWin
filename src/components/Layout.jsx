@@ -25,11 +25,9 @@ export default function Layout() {
       case '/paso-6':
         return 6;
       case '/paso-7':
-        return 7;
       case '/paso-8':
-        return 8;
       case '/paso-9':
-        return 9;
+        return 7;
       default:
         return 1;
     }

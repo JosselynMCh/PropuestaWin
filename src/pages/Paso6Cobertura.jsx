@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
 
@@ -12,8 +12,17 @@ export default function Paso6Cobertura() {
     setCurrentFloorView,
     getAvailableFloors,
     placedElements,
+    setPlacedElements,
     placedWalls,
+    unlockUpTo,
   } = useSimulator();
+
+  const [feedbackMessage, setFeedbackMessage] = useState(null);
+
+  const showFeedback = (msg) => {
+    setFeedbackMessage(msg);
+    setTimeout(() => setFeedbackMessage(null), 3500);
+  };
 
   // Proportional canvas sizing matching step 4 & 5
   const widthM = houseWidth && houseWidth > 0 ? houseWidth : 10;
@@ -42,6 +51,90 @@ export default function Paso6Cobertura() {
   // Filter room elements
   const rooms = placedElements.filter((el) => el.type === 'room');
 
+  // Intelligent Mesh Placement Recommendation Algorithm:
+  // Finds the room that is furthest from the Router or has lowest signal coverage
+  const getRecommendedRepeaterRoom = () => {
+    if (rooms.length === 0) return null;
+    let maxDist = -1;
+    let furthestRoom = rooms[0];
+
+    rooms.forEach((r) => {
+      // Don't recommend the room where the router is already installed
+      if (router && router.roomId && r.id === router.roomId) return;
+      if (router && router.roomName && r.name === router.roomName) return;
+
+      const roomCenterX = r.x + r.w / 2;
+      const roomCenterY = r.y + r.h / 2;
+      const dist = Math.hypot(roomCenterX - routerX, roomCenterY - routerY);
+
+      if (dist > maxDist) {
+        maxDist = dist;
+        furthestRoom = r;
+      }
+    });
+
+    return furthestRoom;
+  };
+
+  const recommendedRoom = getRecommendedRepeaterRoom();
+
+  // Add repeater directly in recommended or specified room
+  const handleAddRepeater = (targetRoom = recommendedRoom) => {
+    let repW = 34;
+    let repH = 34;
+    let placeX = canvasW * 0.75;
+    let placeY = canvasH * 0.25;
+    let roomName = '';
+    let wallDesc = '';
+
+    if (targetRoom) {
+      // Snap to wall inside target room
+      placeX = Math.max(targetRoom.x + 6, Math.min(targetRoom.x + targetRoom.w - repW - 6, targetRoom.x + targetRoom.w / 2));
+      placeY = Math.max(targetRoom.y + 6, targetRoom.y + 6); // top wall
+      roomName = targetRoom.name;
+      wallDesc = `Pared de ${targetRoom.name}`;
+    }
+
+    const newRepeater = {
+      id: `mesh-repeater-${Date.now()}`,
+      itemId: 'mesh-repeater',
+      type: 'device',
+      name: 'Repetidor Mesh WIN',
+      emoji: '🔁',
+      x: Math.round(placeX),
+      y: Math.round(placeY),
+      w: repW,
+      h: repH,
+      snappedWall: wallDesc,
+      roomName: roomName,
+      roomId: targetRoom?.id,
+      hasEthernet: false,
+    };
+
+    setPlacedElements((prev) => [...prev.filter((el) => el.itemId !== 'mesh-repeater'), newRepeater]);
+    showFeedback(`¡Repetidor Mesh WIN añadido con éxito en ${roomName || 'tu plano'}!`);
+  };
+
+  const handleRemoveRepeater = () => {
+    setPlacedElements((prev) => prev.filter((el) => el.itemId !== 'mesh-repeater'));
+    showFeedback('Repetidor Mesh retirado');
+  };
+
+  const handleToggleEthernet = () => {
+    if (!repeater) return;
+    setPlacedElements((prev) =>
+      prev.map((el) =>
+        el.itemId === 'mesh-repeater' ? { ...el, hasEthernet: !el.hasEthernet } : el
+      )
+    );
+    showFeedback(repeater.hasEthernet ? 'Conexión cambiada a Wi-Fi Mesh' : 'Cable Ethernet Backhaul activado');
+  };
+
+  const handleNext = () => {
+    unlockUpTo(7);
+    navigate('/paso-7');
+  };
+
   return (
     <article className="step-view flex-1 flex flex-col justify-between max-w-6xl mx-auto w-full px-2 sm:px-4 py-2" id="step-view-6">
       <div>
@@ -54,15 +147,32 @@ export default function Paso6Cobertura() {
           </h1>
         </div>
 
+        {/* Dynamic Toast Feedback */}
+        {feedbackMessage && (
+          <div className="mb-4 p-3 bg-emerald-50 border border-emerald-300 rounded-2xl flex items-center justify-between shadow-xs">
+            <div className="flex items-center space-x-2 text-xs font-bold text-emerald-800">
+              <span className="text-base">✨</span>
+              <span>{feedbackMessage}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFeedbackMessage(null)}
+              className="text-emerald-600 hover:text-emerald-900 text-xs font-bold ml-2 cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Main Card Container */}
-        <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-100">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="bg-white rounded-3xl p-5 sm:p-7 shadow-sm border border-slate-100">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                 Mapa de calor Wi-Fi en tu hogar
               </h2>
-              <p className="text-slate-400 font-medium text-xs sm:text-sm mt-0.5">
-                Simulación en tiempo real de la propagación de la señal de fibra según tus paredes y ubicación del router.
+              <p className="text-slate-500 font-medium text-xs sm:text-sm mt-0.5">
+                Simulación real de propagación de señal de fibra con atenuación de muros y nodos Mesh.
               </p>
             </div>
 
@@ -86,14 +196,14 @@ export default function Paso6Cobertura() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
             {/* Left: Custom Blueprint & Wi-Fi Heatmap */}
             <div className="lg:col-span-8 flex flex-col items-center">
               <div className="w-full flex items-center justify-between text-xs text-slate-500 font-medium mb-2 px-1">
-                <span>Plano calculado: <b>{widthM}m × {lengthM}m</b> ({widthM * lengthM} m²)</span>
-                <span className="text-[#ff5500] font-semibold flex items-center gap-1">
+                <span>Plano: <b>{widthM}m × {lengthM}m</b> ({widthM * lengthM} m²)</span>
+                <span className="text-[#ff5500] font-semibold flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#ff5500] animate-ping" />
-                  Señal activa 100% Fibra Óptica
+                  Señal activa 100% Fibra Óptica WIN
                 </span>
               </div>
 
@@ -120,10 +230,10 @@ export default function Paso6Cobertura() {
                     <div
                       className="absolute inset-0 pointer-events-none z-12 transition-opacity duration-300"
                       style={{
-                        background: `radial-gradient(circle 350px at ${repeaterX}px ${repeaterY}px, 
-                          rgba(16, 185, 129, 0.48) 0%, 
-                          rgba(16, 185, 129, 0.32) 40%, 
-                          rgba(234, 179, 8, 0.18) 75%, 
+                        background: `radial-gradient(circle 340px at ${repeaterX}px ${repeaterY}px, 
+                          rgba(16, 185, 129, 0.46) 0%, 
+                          rgba(16, 185, 129, 0.30) 40%, 
+                          rgba(234, 179, 8, 0.16) 75%, 
                           transparent 100%)`,
                       }}
                     />
@@ -152,11 +262,11 @@ export default function Paso6Cobertura() {
                   {/* Signal Pulse Rings at Repeater coordinates */}
                   {repeater && repeaterX !== null && (
                     <div
-                      className="absolute pointer-events-none -translate-x-1/2 -translate-y-1/2 z-10"
+                      className="absolute pointer-events-none -translate-x-1/2 -translate-y-1/2 z-11"
                       style={{ left: `${repeaterX}px`, top: `${repeaterY}px` }}
                     >
                       <div className="w-20 h-20 rounded-full border-2 border-emerald-400/70 animate-ping" />
-                      <div className="w-40 h-40 rounded-full border border-emerald-400/50" />
+                      <div className="w-44 h-44 rounded-full border border-emerald-400/50" />
                     </div>
                   )}
 
@@ -222,109 +332,216 @@ export default function Paso6Cobertura() {
                         left: `${repeaterX - 20}px`,
                         top: `${repeaterY - 20}px`,
                       }}
-                      className="absolute z-30 w-10 h-10 bg-emerald-950 text-white rounded-2xl border-2 border-emerald-400 shadow-xl flex items-center justify-center pointer-events-none text-lg"
+                      className="absolute z-30 w-10 h-10 bg-emerald-950 text-white rounded-2xl border-2 border-emerald-400 shadow-xl flex items-center justify-center pointer-events-none text-lg animate-pulse"
                       title="Repetidor Mesh WIN"
                     >
                       <span>🔁</span>
                     </div>
                   )}
+
+                  {/* Connection Line between Router and Mesh Repeater */}
+                  {repeater && repeaterX !== null && (
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none z-25">
+                      <line
+                        x1={routerX}
+                        y1={routerY}
+                        x2={repeaterX}
+                        y2={repeaterY}
+                        stroke="#10b981"
+                        strokeWidth="2.5"
+                        strokeDasharray={repeater.hasEthernet ? 'none' : '4 4'}
+                      />
+                    </svg>
+                  )}
                 </div>
               </div>
 
-              <div className="mt-3 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2 w-full px-2">
+              {/* Status bar under map */}
+              <div className="mt-3 flex items-center justify-between text-xs text-slate-600 flex-wrap gap-2 w-full px-2">
                 <div className="flex items-center space-x-1.5">
-                  <span className="font-semibold text-slate-700">📌 Router WIN:</span>
-                  <span>{router ? (router.snappedWall || `En ${router.roomName || 'plano'}`) : 'Centro de la vivienda'}</span>
+                  <span className="font-bold text-slate-800">📡 Router:</span>
+                  <span>{router ? (router.snappedWall || `En ${router.roomName || 'plano'}`) : 'Centro del hogar'}</span>
                 </div>
-                {repeater && (
+                {repeater ? (
                   <div className="flex items-center space-x-1.5 text-emerald-700 font-bold">
-                    <span>🔁 Repetidor Mesh:</span>
-                    <span>{repeater.snappedWall || `En ${repeater.roomName || 'plano'}`} {repeater.hasEthernet ? '(Cable Ethernet)' : '(Wi-Fi)'}</span>
+                    <span>🔁 Mesh:</span>
+                    <span>{repeater.snappedWall || `En ${repeater.roomName || 'plano'}`} {repeater.hasEthernet ? '(Cable Ethernet)' : '(Wi-Fi 6)'}</span>
                   </div>
+                ) : (
+                  <span className="text-amber-700 font-semibold">
+                    ⚠️ Señal débil en áreas lejanas al router
+                  </span>
                 )}
               </div>
             </div>
 
-            {/* Right: Legend & Diagnostics */}
-            <div className="lg:col-span-4 bg-slate-50 border border-slate-200/90 rounded-2xl p-5 shadow-sm space-y-5">
-              <div>
-                <h3 className="font-bold text-slate-900 text-sm mb-3">Nivel de Cobertura Wi-Fi</h3>
-                <div className="space-y-2.5 text-xs">
-                  <div className="flex items-center justify-between p-2.5 bg-emerald-50/80 border border-emerald-200 rounded-xl">
-                    <div className="flex items-center space-x-2.5">
-                      <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-sm" />
-                      <span className="font-bold text-emerald-900">Excelente (5 GHz)</span>
+            {/* Right: Unified Mesh & Coverage Legend Block */}
+            <div className="lg:col-span-4 bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-100 flex flex-col">
+              
+              {/* Header */}
+              <div className="bg-slate-50/80 px-4 py-3 border-b border-slate-200/80 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+                    Diagnóstico de Cobertura
+                  </span>
+                </div>
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  En tiempo real
+                </span>
+              </div>
+
+              {/* SECTION 1: Niveles de Cobertura */}
+              <div className="p-4 space-y-2.5">
+                <h3 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider">
+                  Rango de Cobertura Wi-Fi
+                </h3>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center justify-between p-2.5 bg-emerald-50/90 border border-emerald-200 rounded-xl">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm" />
+                      <span className="font-bold text-emerald-950">Excelente (5 GHz)</span>
                     </div>
-                    <span className="text-emerald-700 font-extrabold">&gt; 300 Mbps</span>
+                    <span className="text-emerald-700 font-black">&gt; 300 Mbps</span>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 bg-amber-50/80 border border-amber-200 rounded-xl">
-                    <div className="flex items-center space-x-2.5">
-                      <span className="w-3.5 h-3.5 rounded-full bg-amber-500 shadow-sm" />
-                      <span className="font-bold text-amber-900">Buena / Estable</span>
+                  <div className="flex items-center justify-between p-2.5 bg-amber-50/90 border border-amber-200 rounded-xl">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-3 h-3 rounded-full bg-amber-500 shadow-sm" />
+                      <span className="font-bold text-amber-950">Buena / Estable</span>
                     </div>
-                    <span className="text-amber-700 font-extrabold">100 - 300 Mbps</span>
+                    <span className="text-amber-700 font-black">100 - 300 Mbps</span>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 bg-rose-50/80 border border-rose-200 rounded-xl">
-                    <div className="flex items-center space-x-2.5">
-                      <span className="w-3.5 h-3.5 rounded-full bg-rose-500 shadow-sm" />
-                      <span className="font-bold text-rose-900">Débil / Zona Muerta</span>
+                  <div className="flex items-center justify-between p-2.5 bg-rose-50/90 border border-rose-200 rounded-xl">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-3 h-3 rounded-full bg-rose-500 shadow-sm" />
+                      <span className="font-bold text-rose-950">Débil / Zona Muerta</span>
                     </div>
-                    <span className="text-rose-700 font-extrabold">&lt; 30 Mbps</span>
+                    <span className="text-rose-700 font-black">&lt; 30 Mbps</span>
                   </div>
                 </div>
               </div>
 
-              {/* Repeater Card (Adaptive if already active vs suggested) */}
-              {repeater ? (
-                <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-4 shadow-sm space-y-3">
+              {/* SECTION 2: Repetidor Mesh Integrado (Añadir aquí mismo con recomendación) */}
+              <div className="p-4 space-y-3 bg-[#FFFBF9]">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-xl">✨</span>
-                    <h4 className="font-bold text-emerald-950 text-xs">Repetidor Mesh WIN Conectado</h4>
+                    <span className="text-base">🔁</span>
+                    <h4 className="font-extrabold text-slate-900 text-xs">
+                      Repetidor Mesh WIN
+                    </h4>
                   </div>
-                  <p className="text-xs text-emerald-800 leading-relaxed">
-                    La señal se encuentra amplificada al 100% de cobertura simétrica en todas las áreas previamente lejanas.
-                    {repeater.hasEthernet && ' Conexión por cable Ethernet (Backhaul) habilitada.'}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/paso-7')}
-                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-full shadow-md shadow-emerald-600/20 transition flex items-center justify-center space-x-2 cursor-pointer"
+                  <span
+                    className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                      repeater
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                        : 'bg-amber-100 text-amber-800 border border-amber-300'
+                    }`}
                   >
-                    <span>Ajustar parámetros Mesh</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </button>
+                    {repeater ? 'Activo' : 'Recomendado'}
+                  </span>
                 </div>
-              ) : (
-                <div className="bg-white border border-[#ff5500]/30 rounded-2xl p-4 shadow-sm space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xl">🚀</span>
-                    <h4 className="font-bold text-slate-900 text-xs">¿Tienes esquinas con señal débil?</h4>
+
+                {/* Intelligent Placement Recommendation Note */}
+                {recommendedRoom && !repeater && (
+                  <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 text-[11px] text-amber-900 space-y-1">
+                    <div className="font-bold flex items-center space-x-1 text-amber-950">
+                      <span>💡</span>
+                      <span>Ubicación recomendada:</span>
+                    </div>
+                    <p className="leading-snug">
+                      Instalar en <b>{recommendedRoom.emoji} {recommendedRoom.name}</b> para eliminar la zona muerta y balancear la señal al 100%.
+                    </p>
                   </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Para casas de {selectedFloors} piso(s) o paredes gruesas, recomendamos conectar un Repetidor Mesh WIN para llevar la señal al 100%.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/paso-7')}
-                    className="w-full py-3 bg-[#ff5500] hover:bg-[#e64d00] text-white font-bold text-xs rounded-full shadow-md shadow-[#ff5500]/20 transition flex items-center justify-center space-x-2 cursor-pointer"
-                  >
-                    <span>Ver recomendación Mesh WIN</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </button>
-                </div>
-              )}
+                )}
+
+                {repeater ? (
+                  <div className="space-y-2">
+                    <div className="bg-white border border-emerald-300 rounded-xl p-2.5 shadow-2xs flex items-center justify-between">
+                      <div className="flex items-center space-x-2 truncate">
+                        <span className="text-emerald-600 font-bold text-xs">✓</span>
+                        <span className="text-xs font-bold text-slate-800 truncate">
+                          {repeater.snappedWall || `En ${repeater.roomName || 'Pared'}`}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveRepeater}
+                        className="text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-2 py-1 rounded-lg text-xs font-bold cursor-pointer transition"
+                      >
+                        Quitar ✕
+                      </button>
+                    </div>
+
+                    {/* Backhaul ethernet toggle */}
+                    <button
+                      type="button"
+                      onClick={handleToggleEthernet}
+                      className={`w-full py-2 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-between cursor-pointer ${
+                        repeater.hasEthernet
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                          : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                      }`}
+                    >
+                      <span className="flex items-center space-x-1.5">
+                        <span>🔌</span>
+                        <span>Conexión por Cable (Ethernet)</span>
+                      </span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${repeater.hasEthernet ? 'bg-emerald-600 text-white font-black' : 'bg-slate-200 text-slate-600'}`}>
+                        {repeater.hasEthernet ? 'ON' : 'OFF'}
+                      </span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => handleAddRepeater(recommendedRoom)}
+                      className="w-full py-2.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.99] text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center space-x-1.5 shadow-sm shadow-[#ff5500]/25"
+                    >
+                      <span>+ Añadir Repetidor en {recommendedRoom ? recommendedRoom.name : 'tu hogar'}</span>
+                    </button>
+
+                    {/* Direct room options to place repeater */}
+                    {rooms.length > 1 && (
+                      <div className="pt-1">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                          O elegir otra habitación:
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {rooms.map((room) => (
+                            <button
+                              key={room.id}
+                              type="button"
+                              onClick={() => handleAddRepeater(room)}
+                              className="px-2 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 hover:border-[#ff5500] text-slate-700 cursor-pointer flex items-center space-x-1 transition"
+                            >
+                              <span>{room.emoji}</span>
+                              <span>{room.name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer info */}
+              <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-500">
+                <span className="flex items-center space-x-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span>Cobertura calculada: <b className="text-slate-800">{repeater ? '100% Total' : '75% Parcial'}</b></span>
+                </span>
+                <span className="font-bold text-win-600">Wi-Fi 6 WIN</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Navigation Footer */}
+      {/* Navigation Footer: Directly advances to Diagnóstico (Paso 7 now) */}
       <div className="flex items-center justify-between mt-8 pb-4">
         <button
           type="button"
@@ -336,9 +553,9 @@ export default function Paso6Cobertura() {
         <button
           type="button"
           className="inline-flex items-center space-x-2 px-9 py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-base group"
-          onClick={() => navigate('/paso-7')}
+          onClick={handleNext}
         >
-          <span>Siguiente paso</span>
+          <span>Siguiente: Propuesta Final</span>
           <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>
