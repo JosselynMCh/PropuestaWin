@@ -9,15 +9,21 @@ const AVAILABLE_ITEMS = [
   { type: 'room', id: 'bano', name: 'Baño', emoji: '🚿', defaultW: 85, defaultH: 80, bg: 'bg-cyan-50/90', border: 'border-cyan-400' },
   { type: 'room', id: 'estudio', name: 'Estudio', emoji: '💻', defaultW: 110, defaultH: 95, bg: 'bg-purple-50/90', border: 'border-purple-400' },
   { type: 'room', id: 'comedor', name: 'Comedor', emoji: '🪑', defaultW: 120, defaultH: 100, bg: 'bg-emerald-50/90', border: 'border-emerald-400' },
-  { type: 'device', id: 'router', name: 'Router WIN', emoji: '📶', defaultW: 80, defaultH: 80, bg: 'bg-[#ff5500]/10', border: 'border-[#ff5500]' },
-  { type: 'device', id: 'repetidor', name: 'Repetidor Mesh', emoji: '📡', defaultW: 75, defaultH: 75, bg: 'bg-slate-100', border: 'border-slate-400' },
 ];
 
 export default function Paso4Plano() {
   const navigate = useNavigate();
-  const { houseWidth, houseLength, placedElements, setPlacedElements } = useSimulator();
+  const {
+    houseWidth,
+    houseLength,
+    placedElements,
+    setPlacedElements,
+    selectedFloors,
+    currentFloorView,
+    setCurrentFloorView,
+    getAvailableFloors,
+  } = useSimulator();
 
-  const [activeTab, setActiveTab] = useState('habitaciones');
   const [selectedId, setSelectedId] = useState(null);
 
   const canvasRef = useRef(null);
@@ -234,10 +240,6 @@ export default function Paso4Plano() {
 
   const hasOverlaps = overlappingIds.size > 0;
 
-  const filteredPalette = AVAILABLE_ITEMS.filter((item) =>
-    activeTab === 'habitaciones' ? item.type === 'room' : item.type === 'device'
-  );
-
   return (
     <article className="step-view flex-1 flex flex-col justify-between max-w-6xl mx-auto w-full px-2 sm:px-4 py-2" id="step-view-4">
       <div>
@@ -283,7 +285,30 @@ export default function Paso4Plano() {
               </p>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Floor tabs if multi-floor */}
+              {selectedFloors !== '1' && (
+                <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-2xl mr-2">
+                  {getAvailableFloors().map((floor) => (
+                    <button
+                      key={floor}
+                      type="button"
+                      onClick={() => {
+                        setSelectedId(null);
+                        setCurrentFloorView(floor);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                        currentFloorView === floor
+                          ? 'bg-white text-[#ff5500] shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {floor}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {selectedId && (
                 <button
                   type="button"
@@ -449,42 +474,16 @@ export default function Paso4Plano() {
               </div>
             </div>
 
-            {/* Right: Draggable Elements Palette */}
+            {/* Right: Draggable Rooms Palette */}
             <div className="lg:col-span-4 bg-slate-50 border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-slate-900 text-sm">Elementos disponibles</h3>
+                <h3 className="font-bold text-slate-900 text-sm">Habitaciones disponibles</h3>
                 <span className="text-[11px] text-slate-400 font-semibold">Arrastra o clic</span>
               </div>
 
-              {/* Palette Tabs */}
-              <div className="flex p-1 bg-slate-200/70 rounded-xl text-xs font-bold mb-4">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('habitaciones')}
-                  className={`flex-1 py-1.5 rounded-lg transition cursor-pointer text-center ${
-                    activeTab === 'habitaciones'
-                      ? 'bg-white text-[#ff5500] shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Habitaciones
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('dispositivos')}
-                  className={`flex-1 py-1.5 rounded-lg transition cursor-pointer text-center ${
-                    activeTab === 'dispositivos'
-                      ? 'bg-white text-[#ff5500] shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Dispositivos
-                </button>
-              </div>
-
-              {/* Items Grid */}
+              {/* Rooms Grid */}
               <div className="grid grid-cols-2 gap-2.5">
-                {filteredPalette.map((item) => (
+                {AVAILABLE_ITEMS.map((item) => (
                   <div
                     key={item.id}
                     draggable
@@ -503,9 +502,9 @@ export default function Paso4Plano() {
 
               {/* Quick Instructions Badge */}
               <div className="mt-5 pt-4 border-t border-slate-200/80 flex items-start space-x-2.5 text-xs text-slate-600">
-                <span className="text-sm">✨</span>
+                <span className="text-sm">📐</span>
                 <p className="leading-snug">
-                  Coloca al menos tu <b>Sala</b> y tu <b>Router WIN</b> para simular la cobertura en el siguiente paso.
+                  Arma la distribución de tu hogar colocando tus habitaciones. En el siguiente paso colocarás las paredes y tu <b>Router WIN</b>.
                 </p>
               </div>
             </div>
