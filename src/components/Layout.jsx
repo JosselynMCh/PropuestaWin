@@ -47,17 +47,17 @@ export default function Layout() {
 
   return (
     <div className="w-screen h-screen flex flex-col md:flex-row bg-white text-slate-800 overflow-hidden select-none">
-      {/* Base Sidebar that stays consistent across all pages */}
+      {/* Sidebar: mobile top bar + dropdown | desktop vertical sidebar */}
       <Sidebar currentStep={currentStep} />
 
       {/* Scrollable / Flexible Page Viewport */}
-      <main className="flex-1 bg-white flex flex-col overflow-y-auto">
-          <div className="flex-1 flex flex-col justify-between p-6 sm:p-8 lg:p-10">
+      <main className="flex-1 bg-white flex flex-col overflow-y-auto min-h-0">
+          <div className="flex-1 flex flex-col justify-between p-4 sm:p-6 md:p-8 lg:p-10">
             <Outlet />
           </div>
 
           {/* Footer Bar */}
-          <footer className="bg-slate-50 px-8 py-3.5 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-500 flex-shrink-0">
+          <footer className="bg-slate-50 px-4 sm:px-8 py-3 border-t border-slate-200 flex flex-wrap items-center justify-between text-[10px] sm:text-xs text-slate-500 flex-shrink-0 gap-1">
             <span>© 2026 WIN Conectividad Residencial. Todos los derechos reservados.</span>
             <span className="font-semibold text-win-600">100% Fibra Óptica Simétrica</span>
           </footer>

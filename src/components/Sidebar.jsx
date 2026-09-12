@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
 
@@ -10,7 +10,7 @@ const NAV_ITEMS = [
     path: '/',
     icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 011-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
       </svg>
     ),
   },
@@ -88,6 +88,7 @@ export default function Sidebar({ currentStep = 1 }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { maxUnlockedStep } = useSimulator();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isItemActive = (item) => {
     if (currentStep) {
@@ -96,83 +97,187 @@ export default function Sidebar({ currentStep = 1 }) {
     return location.pathname === item.path;
   };
 
+  const handleNavigate = (path) => {
+    navigate(path);
+    setMobileOpen(false);
+  };
+
   return (
-    <aside
-      className="w-full md:w-60 lg:w-64 bg-[#ff5500] text-white flex-shrink-0 flex flex-col justify-between p-4 md:p-5 select-none shadow-xl z-20 overflow-y-auto"
-      data-purpose="vertical-navigation-sidebar"
-    >
-      <div>
-        {/* WIN Brandmark */}
+    <>
+      {/* ──── Mobile Top Bar ──── */}
+      <div className="md:hidden bg-[#ff5500] text-white flex items-center justify-between px-4 py-2.5 shadow-lg z-30 flex-shrink-0">
         <div
-          className="mb-5 pt-1 cursor-pointer flex items-center justify-between group"
-          onClick={() => navigate('/')}
+          className="flex items-center space-x-2 cursor-pointer"
+          onClick={() => handleNavigate('/')}
         >
           <img
-            src="/img/logowin_Anaranjado_Sin_Fondo.png"
-            alt="WIN"
-            className="h-9 md:h-10 w-auto object-contain brightness-0 invert group-hover:scale-105 transition-transform"
+            src="/img/logo_LOQ-WINS.png"
+            alt="LOQ-WINS"
+            className="h-8 w-auto object-contain drop-shadow-sm"
           />
-          <span className="text-[10px] uppercase tracking-wider font-extrabold bg-white/20 px-2 py-0.5 rounded-full text-white/95">
+          <span className="text-[9px] uppercase tracking-wider font-extrabold bg-white/20 px-2 py-0.5 rounded-full text-white/95">
             Simulador
           </span>
         </div>
 
-        {/* Step Navigation for Every Step (1 to 7) */}
-        <nav className="space-y-1.5 font-medium text-xs">
-          {NAV_ITEMS.map((item) => {
-            const active = isItemActive(item);
-            const isUnlocked = item.step <= maxUnlockedStep;
-
-            return (
-              <button
-                key={item.id}
-                disabled={!isUnlocked}
-                onClick={() => {
-                  if (isUnlocked) navigate(item.path);
-                }}
-                className={`w-full text-left flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200 ${
-                  !isUnlocked
-                    ? 'opacity-40 cursor-not-allowed bg-black/5 text-white/60'
-                    : active
-                    ? 'bg-white text-[#ff5500] font-bold shadow-md shadow-black/10 translate-x-1 cursor-pointer'
-                    : 'text-white/90 hover:text-white hover:bg-white/10 cursor-pointer'
-                }`}
-              >
-                <div className="flex items-center space-x-2.5 truncate">
-                  <span
-                    className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                      active
-                        ? 'bg-[#ff5500] text-white'
-                        : isUnlocked
-                        ? 'bg-white/20 text-white'
-                        : 'bg-black/15 text-white/60'
-                    }`}
-                  >
-                    {item.step}
-                  </span>
-                  <span className="text-[13px] tracking-tight truncate font-semibold">
-                    {item.label.replace(/^\d+\.\s*/, '')}
-                  </span>
-                </div>
-
-                {!isUnlocked && (
-                  <svg className="w-3.5 h-3.5 text-white/50 flex-shrink-0 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+        <div className="flex items-center space-x-2">
+          <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full">
+            Paso {currentStep}/7
+          </span>
+          <button
+            type="button"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/15 hover:bg-white/25 transition cursor-pointer"
+            aria-label="Abrir menú"
+          >
+            {mobileOpen ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
 
-      <div className="mt-6 pt-3 border-t border-white/20 text-[11px] text-white/85 flex items-center justify-between">
-        <span className="font-semibold">Fibra 100% Simétrica</span>
-        <span className="flex items-center space-x-1">
-          <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-          <span className="text-[10px] text-emerald-200 font-bold">ONLINE</span>
-        </span>
-      </div>
-    </aside>
+      {/* ──── Mobile Dropdown Menu ──── */}
+      {mobileOpen && (
+        <>
+          {/* Overlay backdrop */}
+          <div
+            className="md:hidden fixed inset-0 bg-black/40 z-40"
+            onClick={() => setMobileOpen(false)}
+          />
+          <nav className="md:hidden fixed top-[52px] left-0 right-0 bg-[#ff5500] z-50 shadow-2xl border-t border-white/15 px-3 py-3 space-y-1.5 max-h-[70vh] overflow-y-auto">
+            {NAV_ITEMS.map((item) => {
+              const active = isItemActive(item);
+              const isUnlocked = item.step <= maxUnlockedStep;
+
+              return (
+                <button
+                  key={item.id}
+                  disabled={!isUnlocked}
+                  onClick={() => {
+                    if (isUnlocked) handleNavigate(item.path);
+                  }}
+                  className={`w-full text-left flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 ${
+                    !isUnlocked
+                      ? 'opacity-40 cursor-not-allowed bg-black/5 text-white/60'
+                      : active
+                      ? 'bg-white text-[#ff5500] font-bold shadow-md shadow-black/10 cursor-pointer'
+                      : 'text-white/90 hover:text-white hover:bg-white/10 cursor-pointer'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5 truncate">
+                    <span
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+                        active
+                          ? 'bg-[#ff5500] text-white'
+                          : isUnlocked
+                          ? 'bg-white/20 text-white'
+                          : 'bg-black/15 text-white/60'
+                      }`}
+                    >
+                      {item.step}
+                    </span>
+                    <span className="text-sm tracking-tight truncate font-semibold">
+                      {item.label.replace(/^\d+\.\s*/, '')}
+                    </span>
+                  </div>
+
+                  {!isUnlocked && (
+                    <svg className="w-3.5 h-3.5 text-white/50 flex-shrink-0 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </>
+      )}
+
+      {/* ──── Desktop Sidebar ──── */}
+      <aside
+        className="hidden md:flex md:w-60 lg:w-64 bg-[#ff5500] text-white flex-shrink-0 flex-col justify-between p-4 md:p-5 select-none shadow-xl z-20 overflow-y-auto"
+        data-purpose="vertical-navigation-sidebar"
+      >
+        <div>
+          {/* WIN Brandmark */}
+          <div
+            className="mb-5 pt-1 cursor-pointer flex items-center justify-between group"
+            onClick={() => navigate('/')}
+          >
+            <img
+              src="/img/logo_LOQ-WINS.png"
+              alt="LOQ-WINS"
+              className="h-10 md:h-12 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+            />
+            <span className="text-[10px] uppercase tracking-wider font-extrabold bg-white/20 px-2 py-0.5 rounded-full text-white/95">
+              Simulador
+            </span>
+          </div>
+
+          {/* Step Navigation for Every Step (1 to 7) */}
+          <nav className="space-y-1.5 font-medium text-xs">
+            {NAV_ITEMS.map((item) => {
+              const active = isItemActive(item);
+              const isUnlocked = item.step <= maxUnlockedStep;
+
+              return (
+                <button
+                  key={item.id}
+                  disabled={!isUnlocked}
+                  onClick={() => {
+                    if (isUnlocked) navigate(item.path);
+                  }}
+                  className={`w-full text-left flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200 ${
+                    !isUnlocked
+                      ? 'opacity-40 cursor-not-allowed bg-black/5 text-white/60'
+                      : active
+                      ? 'bg-white text-[#ff5500] font-bold shadow-md shadow-black/10 translate-x-1 cursor-pointer'
+                      : 'text-white/90 hover:text-white hover:bg-white/10 cursor-pointer'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5 truncate">
+                    <span
+                      className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+                        active
+                          ? 'bg-[#ff5500] text-white'
+                          : isUnlocked
+                          ? 'bg-white/20 text-white'
+                          : 'bg-black/15 text-white/60'
+                      }`}
+                    >
+                      {item.step}
+                    </span>
+                    <span className="text-[13px] tracking-tight truncate font-semibold">
+                      {item.label.replace(/^\d+\.\s*/, '')}
+                    </span>
+                  </div>
+
+                  {!isUnlocked && (
+                    <svg className="w-3.5 h-3.5 text-white/50 flex-shrink-0 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        <div className="mt-6 pt-3 border-t border-white/20 text-[11px] text-white/85 flex items-center justify-between">
+          <span className="font-semibold">Fibra 100% Simétrica</span>
+          <span className="flex items-center space-x-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+            <span className="text-[10px] text-emerald-200 font-bold">ONLINE</span>
+          </span>
+        </div>
+      </aside>
+    </>
   );
 }
