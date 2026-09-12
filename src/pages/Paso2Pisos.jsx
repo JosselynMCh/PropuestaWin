@@ -10,94 +10,193 @@ export default function Paso2Pisos() {
     {
       val: '1',
       label: '1 piso',
+      description: 'Casas de un nivel o departamentos',
+      recommendation: '1 Router WIN cubre todo',
       icon: (
-        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        <svg className="w-16 h-16 text-[#ff5500]" viewBox="0 0 64 64" fill="none" stroke="currentColor">
+          <path d="M12 30L32 14L52 30" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M42 22V16H47V26" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M16 28V50H48V28" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M27 50V38H37V50" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       ),
     },
     {
       val: '2',
       label: '2 pisos',
+      description: 'Viviendas familiares estándar',
+      recommendation: 'Recomendado MESH para piso 2',
+      badge: 'Más común',
       icon: (
-        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        <svg className="w-16 h-16 text-[#ff5500]" viewBox="0 0 64 64" fill="none" stroke="currentColor">
+          <path d="M12 30L32 14L52 30" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M42 22V16H47V26" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M16 28V50H48V28" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M27 50V38H37V50" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <line x1="16" y1="36" x2="48" y2="36" strokeWidth="2" strokeDasharray="2 2" />
+          <rect x="20" y="27" width="8" height="6" strokeWidth="2" rx="1" />
+          <rect x="36" y="27" width="8" height="6" strokeWidth="2" rx="1" />
+        </svg>
       ),
     },
     {
       val: '3',
       label: '3 pisos',
+      description: 'Hogares amplios de varios niveles',
+      recommendation: 'Cobertura vertical con 2 MESH',
       icon: (
-        <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        <svg className="w-16 h-16 text-[#ff5500]" viewBox="0 0 64 64" fill="none" stroke="currentColor">
+          <path d="M12 28L32 12L52 28" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M42 20V14H47V24" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M16 26V52H48V26" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M28 52V42H36V52" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="20" y="34" width="7" height="6" strokeWidth="2" rx="1" />
+          <rect x="37" y="34" width="7" height="6" strokeWidth="2" rx="1" />
+          <rect x="20" y="23" width="7" height="6" strokeWidth="2" rx="1" />
+          <rect x="37" y="23" width="7" height="6" strokeWidth="2" rx="1" />
+        </svg>
       ),
     },
     {
       val: '4+',
       label: 'Más de 3',
-      icon: <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />,
+      description: 'Edificios residenciales o multifamiliar',
+      recommendation: 'Solución Mesh integral WIN',
+      icon: (
+        <svg className="w-16 h-16 text-[#ff5500]" viewBox="0 0 64 64" fill="none" stroke="currentColor">
+          <path d="M12 28L32 12L52 28" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M42 20V14H47V24" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M16 26V52H48V26" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M28 52V42H36V52" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="19" y="34" width="6" height="5" strokeWidth="1.8" rx="1" />
+          <rect x="29" y="34" width="6" height="5" strokeWidth="1.8" rx="1" />
+          <rect x="39" y="34" width="6" height="5" strokeWidth="1.8" rx="1" />
+          <rect x="19" y="24" width="6" height="5" strokeWidth="1.8" rx="1" />
+          <rect x="29" y="24" width="6" height="5" strokeWidth="1.8" rx="1" />
+          <rect x="39" y="24" width="6" height="5" strokeWidth="1.8" rx="1" />
+        </svg>
+      ),
     },
   ];
 
+  const currentSelection = floorOptions.find((f) => f.val === selectedFloors) || floorOptions[1];
+
   return (
-    <article className="step-view flex-1 flex flex-col justify-between" id="step-view-2">
+    <article className="step-view flex-1 flex flex-col justify-between max-w-5xl mx-auto w-full px-2 sm:px-4 py-2" id="step-view-2">
       <div>
-        <div className="flex items-center space-x-3 mb-4">
-          <span className="w-8 h-8 rounded-full bg-win-500 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+        {/* Step Indicator Header matching WIN design system */}
+        <div className="flex items-center space-x-3 mb-6">
+          <span className="w-9 h-9 rounded-full bg-[#ff5500] text-white font-extrabold flex items-center justify-center text-base shadow-sm">
             2
           </span>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Selecciona la cantidad de pisos</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Selecciona la cantidad de pisos
+          </h1>
         </div>
 
-        <div className="mt-8 mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">¿Cuántos pisos tiene tu hogar?</h2>
-          <p className="text-slate-500 text-base mt-2">
-            Selecciona el número de pisos de tu vivienda para calcular la distribución de la señal.
-          </p>
-        </div>
+        {/* Main Card Container */}
+        <div className="bg-white rounded-3xl p-6 sm:p-10 md:p-12 shadow-sm border border-slate-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-8">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                ¿Cuántos pisos tiene tu hogar?
+              </h2>
+              <p className="text-slate-400 font-medium text-sm sm:text-base mt-1">
+                Selecciona el número de pisos de tu vivienda para simular la señal vertical.
+              </p>
+            </div>
+            {currentSelection?.badge && (
+              <span className="self-start sm:self-center px-3 py-1 bg-[#FFF8F5] text-[#ff5500] text-xs font-bold rounded-full border border-[#ff5500]/20">
+                ⭐ {currentSelection.badge}
+              </span>
+            )}
+          </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-3xl">
-          {floorOptions.map((card) => {
-            const isChecked = selectedFloors === card.val;
-            return (
-              <div
-                key={card.val}
-                onClick={() => setSelectedFloors(card.val)}
-                className={`cursor-pointer group border-2 rounded-2xl p-6 flex flex-col items-center justify-center transition text-center shadow-sm ${
-                  isChecked
-                    ? 'border-win-500 bg-win-50 shadow-md ring-2 ring-win-500/20'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
-                }`}
-              >
-                <div
-                  className={`w-16 h-16 mb-4 flex items-center justify-center transition ${
-                    isChecked ? 'text-win-500 scale-105' : 'text-slate-500 group-hover:text-win-500'
+          {/* Grid of 4 Floor Cards with Friendly Micro-interactions */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {floorOptions.map((card) => {
+              const isChecked = selectedFloors === card.val;
+              return (
+                <button
+                  key={card.val}
+                  type="button"
+                  onClick={() => setSelectedFloors(card.val)}
+                  className={`group relative cursor-pointer rounded-2xl p-5 sm:p-6 flex flex-col items-center justify-between transition-all duration-200 text-center ${
+                    isChecked
+                      ? 'border-2 border-[#ff5500] bg-[#FFF8F5] shadow-md shadow-[#ff5500]/15 scale-[1.03]'
+                      : 'border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50/60 hover:shadow-sm'
                   }`}
                 >
-                  <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                  {/* Selected check pill */}
+                  {isChecked && (
+                    <span className="absolute top-3 right-3 w-5 h-5 bg-[#ff5500] text-white rounded-full flex items-center justify-center text-xs">
+                      ✓
+                    </span>
+                  )}
+
+                  {/* House Illustration */}
+                  <div className="w-18 h-18 sm:w-20 sm:h-20 flex items-center justify-center my-2 transition-transform duration-200 group-hover:scale-105">
                     {card.icon}
-                  </svg>
-                </div>
-                <span className="font-bold text-slate-800 text-base">{card.label}</span>
+                  </div>
+
+                  <div>
+                    <span className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight block">
+                      {card.label}
+                    </span>
+                    <span className="text-[11px] sm:text-xs text-slate-400 font-medium block mt-1 line-clamp-2">
+                      {card.description}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Friendly Contextual Tip */}
+          <div className="mt-8 bg-[#FFF8F5] border border-[#ff5500]/20 rounded-2xl p-4 sm:p-5 flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center space-x-3">
+              <div className="w-7 h-7 rounded-full bg-[#ff5500] text-white flex-shrink-0 flex items-center justify-center font-bold text-xs">
+                💡
               </div>
-            );
-          })}
+              <div className="text-xs sm:text-sm text-slate-700">
+                <span className="font-bold text-slate-900">Configuración recomendada para {currentSelection.label}: </span>
+                <span>{currentSelection.recommendation}</span>
+              </div>
+            </div>
+            <span className="text-xs font-semibold text-[#ff5500] bg-white px-3 py-1 rounded-full border border-[#ff5500]/20">
+              Fibra simétrica WIN
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-12 pt-6 border-t border-slate-100">
+      {/* Bottom Actions */}
+      <div className="flex items-center justify-between mt-8 pb-4">
         <button
-          className="px-6 py-3 border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold rounded-full transition cursor-pointer"
+          type="button"
           onClick={() => navigate('/')}
+          className="px-7 py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 text-slate-600 font-bold rounded-full transition cursor-pointer text-sm"
         >
           Atrás
         </button>
         <button
-          className="px-8 py-3.5 bg-win-500 hover:bg-win-600 text-white font-semibold rounded-full shadow-md transition flex items-center space-x-2 cursor-pointer"
+          type="button"
           onClick={() => navigate('/paso-3')}
+          className="inline-flex items-center space-x-2 px-9 py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-base group"
         >
           <span>Siguiente</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          <svg
+            className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>
         </button>
       </div>
     </article>
   );
 }
+
