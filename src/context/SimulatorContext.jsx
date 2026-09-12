@@ -8,6 +8,7 @@ export function SimulatorProvider({ children }) {
   const [houseLength, setHouseLength] = useState(15);
   const [currentFloorView, setCurrentFloorView] = useState('Primer piso');
   const [placedElements, setPlacedElements] = useState([]);
+  const [placedWalls, setPlacedWalls] = useState([]); // [{ id, x, y, w, h, orientation: 'horizontal'|'vertical', type: 'concreto'|'drywall'|'vidrio' }]
 
   return (
     <SimulatorContext.Provider
@@ -22,6 +23,8 @@ export function SimulatorProvider({ children }) {
         setCurrentFloorView,
         placedElements,
         setPlacedElements,
+        placedWalls,
+        setPlacedWalls,
       }}
     >
       {children}

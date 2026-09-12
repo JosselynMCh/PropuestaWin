@@ -3,69 +3,103 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const NAV_ITEMS = [
   {
+    step: 1,
     id: 'inicio',
-    label: 'Inicio',
+    label: '1. Inicio',
     path: '/',
-    activeSteps: [1],
     icon: (
-      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 011-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
       </svg>
     ),
   },
   {
+    step: 2,
     id: 'pisos',
-    label: 'Pisos',
+    label: '2. Pisos',
     path: '/paso-2',
-    activeSteps: [2],
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
       </svg>
     ),
   },
   {
+    step: 3,
     id: 'medidas',
-    label: 'Medidas',
+    label: '3. Medidas',
     path: '/paso-3',
-    activeSteps: [3],
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 7v5l3 3" />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
       </svg>
     ),
   },
   {
-    id: 'diseno',
-    label: 'Diseño',
+    step: 4,
+    id: 'plano',
+    label: '4. Habitaciones',
     path: '/paso-4',
-    activeSteps: [4, 5],
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16M12 4v16" />
       </svg>
     ),
   },
   {
+    step: 5,
+    id: 'paredes-router',
+    label: '5. Paredes y Router',
+    path: '/paso-5',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16" />
+      </svg>
+    ),
+  },
+  {
+    step: 6,
     id: 'cobertura',
-    label: 'Cobertura',
+    label: '6. Cobertura Wi-Fi',
     path: '/paso-6',
-    activeSteps: [6, 7],
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
       </svg>
     ),
   },
   {
-    id: 'resultado',
-    label: 'Resultado',
-    path: '/paso-8',
-    activeSteps: [8, 9],
+    step: 7,
+    id: 'ajustes-mesh',
+    label: '7. Ajustes y Mesh',
+    path: '/paso-7',
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+      </svg>
+    ),
+  },
+  {
+    step: 8,
+    id: 'diagnostico',
+    label: '8. Diagnóstico',
+    path: '/paso-8',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
+  },
+  {
+    step: 9,
+    id: 'propuesta',
+    label: '9. Propuesta Final',
+    path: '/paso-9',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
   },
@@ -77,53 +111,68 @@ export default function Sidebar({ currentStep = 1 }) {
 
   const isItemActive = (item) => {
     if (currentStep) {
-      return item.activeSteps.includes(currentStep);
+      return item.step === currentStep;
     }
     return location.pathname === item.path;
   };
 
   return (
     <aside
-      className="w-full md:w-56 lg:w-60 bg-[#ff5500] text-white flex-shrink-0 flex flex-col justify-between p-5 md:p-6 select-none shadow-xl z-20"
+      className="w-full md:w-60 lg:w-64 bg-[#ff5500] text-white flex-shrink-0 flex flex-col justify-between p-4 md:p-5 select-none shadow-xl z-20 overflow-y-auto"
       data-purpose="vertical-navigation-sidebar"
     >
       <div>
         {/* WIN Brandmark matching screenshot */}
-        <div className="mb-8 md:mb-10 pt-1 cursor-pointer flex items-center" onClick={() => navigate('/')}>
+        <div
+          className="mb-5 pt-1 cursor-pointer flex items-center justify-between group"
+          onClick={() => navigate('/')}
+        >
           <img
             src="/img/logowin_Anaranjado_Sin_Fondo.png"
             alt="WIN"
-            className="h-10 md:h-12 w-auto object-contain brightness-0 invert"
+            className="h-9 md:h-10 w-auto object-contain brightness-0 invert group-hover:scale-105 transition-transform"
           />
+          <span className="text-[10px] uppercase tracking-wider font-extrabold bg-white/20 px-2 py-0.5 rounded-full text-white/95">
+            Simulador
+          </span>
         </div>
 
-        {/* Flow Step Indicators */}
-        <nav className="space-y-3 font-medium text-sm">
+        {/* Step Navigation for Every Step */}
+        <nav className="space-y-1.5 font-medium text-xs">
           {NAV_ITEMS.map((item) => {
             const active = isItemActive(item);
             return (
               <button
                 key={item.id}
                 onClick={() => navigate(item.path)}
-                className={`w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-full transition-all duration-200 cursor-pointer ${
+                className={`w-full text-left flex items-center space-x-2.5 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer ${
                   active
-                    ? 'bg-white text-[#ff5500] font-bold shadow-md shadow-black/10 translate-x-0.5'
+                    ? 'bg-white text-[#ff5500] font-bold shadow-md shadow-black/10 translate-x-1'
                     : 'text-white/85 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <span className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                  {item.icon}
+                <span
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+                    active ? 'bg-[#ff5500] text-white' : 'bg-white/15 text-white'
+                  }`}
+                >
+                  {item.step}
                 </span>
-                <span className="text-[14px] tracking-wide font-semibold">{item.label}</span>
+                <span className="text-[13px] tracking-tight truncate font-semibold">
+                  {item.label.replace(/^\d+\.\s*/, '')}
+                </span>
               </button>
             );
           })}
         </nav>
       </div>
 
-      <div className="mt-8 pt-4 border-t border-white/20 text-xs text-white/80 flex items-center justify-between">
-        <span>Fibra 100% simétrica</span>
-        <span className="w-2 h-2 rounded-full bg-emerald-300"></span>
+      <div className="mt-6 pt-3 border-t border-white/20 text-[11px] text-white/85 flex items-center justify-between">
+        <span className="font-semibold">Fibra 100% Simétrica</span>
+        <span className="flex items-center space-x-1">
+          <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+          <span className="text-[10px] text-emerald-200 font-bold">ONLINE</span>
+        </span>
       </div>
     </aside>
   );
