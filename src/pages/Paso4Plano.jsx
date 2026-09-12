@@ -13,7 +13,16 @@ const AVAILABLE_ITEMS = [
 
 export default function Paso4Plano() {
   const navigate = useNavigate();
-  const { houseWidth, houseLength, placedElements, setPlacedElements } = useSimulator();
+  const {
+    houseWidth,
+    houseLength,
+    placedElements,
+    setPlacedElements,
+    selectedFloors,
+    currentFloorView,
+    setCurrentFloorView,
+    getAvailableFloors,
+  } = useSimulator();
 
   const [selectedId, setSelectedId] = useState(null);
 
@@ -276,7 +285,30 @@ export default function Paso4Plano() {
               </p>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Floor tabs if multi-floor */}
+              {selectedFloors !== '1' && (
+                <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-2xl mr-2">
+                  {getAvailableFloors().map((floor) => (
+                    <button
+                      key={floor}
+                      type="button"
+                      onClick={() => {
+                        setSelectedId(null);
+                        setCurrentFloorView(floor);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                        currentFloorView === floor
+                          ? 'bg-white text-[#ff5500] shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {floor}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {selectedId && (
                 <button
                   type="button"

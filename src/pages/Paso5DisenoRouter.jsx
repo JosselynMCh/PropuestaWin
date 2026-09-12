@@ -16,16 +16,20 @@ export default function Paso5DisenoRouter() {
     selectedFloors,
     currentFloorView,
     setCurrentFloorView,
+    getAvailableFloors,
     placedElements,
     setPlacedElements,
     placedWalls,
     setPlacedWalls,
+    clearCurrentFloor,
+    clearCurrentFloorWallsAndDevices,
   } = useSimulator();
 
   const [selectedWallMaterial, setSelectedWallMaterial] = useState('concreto');
   const [wallOrientation, setWallOrientation] = useState('horizontal'); // 'horizontal' | 'vertical'
   const [selectedElementId, setSelectedElementId] = useState(null);
   const [selectedWallId, setSelectedWallId] = useState(null);
+  const [feedbackMessage, setFeedbackMessage] = useState(null);
 
   const canvasRef = useRef(null);
   const activeInteractionRef = useRef(null); // { type: 'moveElement' | 'moveWall', id, startX, startY, origX, origY }
@@ -178,13 +182,117 @@ export default function Paso5DisenoRouter() {
     setSelectedElementId(null);
   };
 
-  // --- Add Router if none exists ---
-  const handleAddRouter = () => {
+  // Rooms and Router
+  const rooms = placedElements.filter((el) => el.type === 'room');
+  const routerDevice = placedElements.find((el) => el.itemId === 'router');
+
+  // --- Automatic Wall Snapping Algorithm ---
+  // When placing or moving a router/repeater in a room, snaps it flush against the closest wall
+  const snapDeviceToWall = (devX, devY, devW, devH) => {
+    const centerX = devX + devW / 2;
+    const centerY = devY + devH / 2;
+
+    // 1. Find containing room or closest room
+    let targetRoom = rooms.find(
+      (r) => centerX >= r.x && centerX <= r.x + r.w && centerY >= r.y && centerY <= r.y + r.h
+    );
+
+    if (!targetRoom && rooms.length > 0) {
+      let minDist = Infinity;
+      rooms.forEach((r) => {
+        const rcx = r.x + r.w / 2;
+        const rcy = r.y + r.h / 2;
+        const d = Math.hypot(centerX - rcx, centerY - rcy);
+        if (d < minDist) {
+          minDist = d;
+          targetRoom = r;
+        }
+      });
+    }
+
+    if (targetRoom) {
+      const dTop = Math.abs(centerY - targetRoom.y);
+      const dBottom = Math.abs(centerY - (targetRoom.y + targetRoom.h));
+      const dLeft = Math.abs(centerX - targetRoom.x);
+      const dRight = Math.abs(centerX - (targetRoom.x + targetRoom.w));
+
+      const minEdge = Math.min(dTop, dBottom, dLeft, dRight);
+      let snappedX = devX;
+      let snappedY = devY;
+      let wallDesc = '';
+
+      if (minEdge === dTop) {
+        snappedY = Math.max(0, targetRoom.y + 4);
+        snappedX = Math.max(targetRoom.x + 4, Math.min(targetRoom.x + targetRoom.w - devW - 4, devX));
+        wallDesc = `Pared superior (${targetRoom.name})`;
+      } else if (minEdge === dBottom) {
+        snappedY = Math.min(canvasH - devH, targetRoom.y + targetRoom.h - devH - 4);
+        snappedX = Math.max(targetRoom.x + 4, Math.min(targetRoom.x + targetRoom.w - devW - 4, devX));
+        wallDesc = `Pared inferior (${targetRoom.name})`;
+      } else if (minEdge === dLeft) {
+        snappedX = Math.max(0, targetRoom.x + 4);
+        snappedY = Math.max(targetRoom.y + 4, Math.min(targetRoom.y + targetRoom.h - devH - 4, devY));
+        wallDesc = `Pared izquierda (${targetRoom.name})`;
+      } else {
+        snappedX = Math.min(canvasW - devW, targetRoom.x + targetRoom.w - devW - 4);
+        snappedY = Math.max(targetRoom.y + 4, Math.min(targetRoom.y + targetRoom.h - devH - 4, devY));
+        wallDesc = `Pared derecha (${targetRoom.name})`;
+      }
+
+      return {
+        x: Math.round(snappedX),
+        y: Math.round(snappedY),
+        roomName: targetRoom.name,
+        wallDesc,
+        roomId: targetRoom.id,
+      };
+    }
+
+    // 2. Fallback: Snap to nearest canvas border if no room exists
+    const dTop = devY;
+    const dBottom = canvasH - (devY + devH);
+    const dLeft = devX;
+    const dRight = canvasW - (devX + devW);
+    const minC = Math.min(dTop, dBottom, dLeft, dRight);
+
+    if (minC === dTop) return { x: Math.round(devX), y: 4, roomName: 'Perímetro', wallDesc: 'Pared norte' };
+    if (minC === dBottom) return { x: Math.round(devX), y: Math.round(canvasH - devH - 4), roomName: 'Perímetro', wallDesc: 'Pared sur' };
+    if (minC === dLeft) return { x: 4, y: Math.round(devY), roomName: 'Perímetro', wallDesc: 'Pared oeste' };
+    return { x: Math.round(canvasW - devW - 4), y: Math.round(devY), roomName: 'Perímetro', wallDesc: 'Pared este' };
+  };
+
+  // --- Add Router with automatic Wall Snapping ---
+  const handleAddRouter = (preferredRoom = null) => {
     const existingRouter = placedElements.find((el) => el.itemId === 'router');
+    const targetRoom = preferredRoom || rooms.find((r) => r.itemId === 'sala') || rooms[0];
+    const devW = 44;
+    const devH = 44;
+
+    // Specific placement: aligned flush against the bottom wall of the target room (e.g. Sala)
+    let initialX, initialY;
+    if (targetRoom) {
+      initialX = targetRoom.x + Math.max(2, Math.round((targetRoom.w - devW) / 2));
+      initialY = targetRoom.y + targetRoom.h - devH - 2;
+    } else {
+      initialX = Math.round((canvasW - devW) / 2);
+      initialY = canvasH - devH - 4;
+    }
+
+    const snapped = snapDeviceToWall(initialX, initialY, devW, devH);
+
     if (existingRouter) {
+      setPlacedElements((prev) =>
+        prev.map((el) =>
+          el.id === existingRouter.id
+            ? { ...el, x: snapped.x, y: snapped.y, w: devW, h: devH, snappedWall: snapped.wallDesc, roomName: snapped.roomName }
+            : el
+        )
+      );
       setSelectedElementId(existingRouter.id);
+      showFeedback(`Router ubicado en la pared de ${snapped.roomName}`);
       return;
     }
+
     const newRouter = {
       id: `router-${Date.now()}`,
       itemId: 'router',
@@ -193,13 +301,35 @@ export default function Paso5DisenoRouter() {
       type: 'device',
       bg: 'bg-[#ff5500]/15',
       border: 'border-[#ff5500]',
-      x: (canvasW - 75) / 2,
-      y: (canvasH - 75) / 2,
-      w: 75,
-      h: 75,
+      x: snapped.x,
+      y: snapped.y,
+      w: devW,
+      h: devH,
+      snappedWall: snapped.wallDesc,
+      roomName: snapped.roomName,
     };
+
     setPlacedElements((prev) => [...prev, newRouter]);
     setSelectedElementId(newRouter.id);
+    showFeedback(`Router ubicado en la pared de ${snapped.roomName}`);
+  };
+
+  const showFeedback = (msg) => {
+    setFeedbackMessage(msg);
+    setTimeout(() => setFeedbackMessage(null), 4500);
+  };
+
+  // --- Clear Floor Handler ---
+  const handleClearFloor = (clearAll = false) => {
+    if (clearAll) {
+      clearCurrentFloor();
+      showFeedback('Plano de este piso limpiado completamente');
+    } else {
+      clearCurrentFloorWallsAndDevices();
+      showFeedback('Paredes y Router limpiados de este piso');
+    }
+    setSelectedElementId(null);
+    setSelectedWallId(null);
   };
 
   // --- Move Handlers ---
@@ -259,6 +389,27 @@ export default function Paso5DisenoRouter() {
   };
 
   const handleMouseUp = () => {
+    const inter = activeInteractionRef.current;
+    if (inter && inter.type === 'element') {
+      // Auto-snap device to nearest wall on drop
+      setPlacedElements((prev) =>
+        prev.map((el) => {
+          if (el.id === inter.id && el.type === 'device') {
+            const snapped = snapDeviceToWall(el.x, el.y, el.w, el.h);
+            showFeedback(`${el.name} pegado a la pared de ${snapped.roomName}`);
+            return {
+              ...el,
+              x: snapped.x,
+              y: snapped.y,
+              snappedWall: snapped.wallDesc,
+              roomName: snapped.roomName,
+            };
+          }
+          return el;
+        })
+      );
+    }
+
     activeInteractionRef.current = null;
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('mouseup', handleMouseUp);
@@ -286,8 +437,6 @@ export default function Paso5DisenoRouter() {
     );
   };
 
-  // Check if router is placed
-  const routerCount = placedElements.filter((el) => el.itemId === 'router').length;
 
   return (
     <article className="step-view flex-1 flex flex-col justify-between max-w-6xl mx-auto w-full px-2 sm:px-4 py-2" id="step-view-5">
@@ -304,36 +453,72 @@ export default function Paso5DisenoRouter() {
 
         {/* Main Card Container */}
         <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-100">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                 Paredes y ubicación del Router
               </h2>
               <p className="text-slate-400 font-medium text-xs sm:text-sm mt-0.5">
-                Haz un clic en cualquier borde para colocar una pared y ubica tu <b>Router WIN</b> en la habitación deseada.
+                Haz un clic en cualquier borde para colocar una pared y ubica tu <b>Router WIN</b> en la pared de la habitación deseada.
               </p>
             </div>
 
-            {/* Floor selector if more than 1 floor */}
-            {selectedFloors !== '1' && (
-              <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-2xl">
-                {['Primer piso', 'Segundo piso'].map((floor) => (
-                  <button
-                    key={floor}
-                    type="button"
-                    onClick={() => setCurrentFloorView(floor)}
-                    className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition ${
-                      currentFloorView === floor
-                        ? 'bg-white text-[#ff5500] shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    {floor}
-                  </button>
-                ))}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Floor selector if more than 1 floor */}
+              {selectedFloors !== '1' && (
+                <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-2xl">
+                  {getAvailableFloors().map((floor) => (
+                    <button
+                      key={floor}
+                      type="button"
+                      onClick={() => {
+                        setSelectedElementId(null);
+                        setSelectedWallId(null);
+                        setCurrentFloorView(floor);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                        currentFloorView === floor
+                          ? 'bg-white text-[#ff5500] shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {floor}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Botón Limpiar Plano */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={() => handleClearFloor(false)}
+                  className="px-3.5 py-1.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 border border-slate-200 hover:border-rose-200 text-slate-700 font-bold rounded-xl text-xs transition flex items-center space-x-1.5 cursor-pointer shadow-xs"
+                  title="Limpiar paredes y dispositivos de este piso"
+                >
+                  <span>🧹</span>
+                  <span>Limpiar plano</span>
+                </button>
               </div>
-            )}
+            </div>
           </div>
+
+          {/* Dynamic feedback toast / notification */}
+          {feedbackMessage && (
+            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-300/80 rounded-2xl flex items-center justify-between shadow-xs animate-fadeIn">
+              <div className="flex items-center space-x-2 text-xs font-bold text-emerald-800">
+                <span className="text-base">✨</span>
+                <span>{feedbackMessage}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFeedbackMessage(null)}
+                className="text-emerald-600 hover:text-emerald-900 text-xs font-bold ml-2 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left Blueprint: Shows rooms from Step 4 + Walls + Routers */}
@@ -488,11 +673,12 @@ export default function Paso5DisenoRouter() {
                     );
                   })}
 
-                  {/* 3. Render Routers and Devices (Top z-index with pulse wave) */}
+                  {/* 3. Render Router WIN (Compact Wall-Mounted Hardware) */}
                   {placedElements
                     .filter((el) => el.type === 'device')
                     .map((dev) => {
                       const isSel = dev.id === selectedElementId;
+
                       return (
                         <div
                           key={dev.id}
@@ -503,20 +689,31 @@ export default function Paso5DisenoRouter() {
                             width: `${dev.w}px`,
                             height: `${dev.h}px`,
                           }}
-                          className={`absolute rounded-2xl flex flex-col items-center justify-center p-2 cursor-grab active:cursor-grabbing transition-all z-40 bg-slate-900 border-2 border-white shadow-xl ${
-                            isSel ? 'ring-3 ring-[#ff5500] ring-offset-2' : ''
+                          className={`absolute rounded-xl flex flex-col items-center justify-center cursor-grab active:cursor-grabbing transition-all z-40 border-2 shadow-md bg-slate-900 border-white text-white ${
+                            isSel ? 'ring-2 ring-[#ff5500] ring-offset-1 scale-105 shadow-xl' : 'hover:scale-105'
                           }`}
+                          title={`${dev.name} (${dev.snappedWall || 'en pared'})`}
                         >
                           {/* Pulsing signal halo */}
-                          <div className="absolute -inset-3 rounded-full bg-[#ff5500]/20 animate-ping pointer-events-none"></div>
+                          <div className="absolute -inset-1.5 rounded-full pointer-events-none animate-ping opacity-25 bg-[#ff5500]" />
 
-                          <div className="flex items-center space-x-1 mb-1 pointer-events-none">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                            <span className="text-[10px] font-black text-white uppercase tracking-wider">
-                              {dev.name.includes('Router') ? 'ROUTER' : 'MESH'}
+                          <div className="flex items-center space-x-0.5 pointer-events-none -mt-0.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#ff5500]" />
+                            <span className="text-[7px] font-black uppercase tracking-tight">
+                              ROUTER
                             </span>
                           </div>
-                          <span className="text-xl pointer-events-none">📶</span>
+                          <span className="text-sm pointer-events-none leading-none mt-0.5">
+                            {dev.emoji || '📶'}
+                          </span>
+
+                          {/* Wall Snapped badge */}
+                          {dev.snappedWall && (
+                            <div className="absolute -bottom-3.5 bg-slate-900/90 text-white text-[7px] font-bold px-1 rounded whitespace-nowrap shadow-xs pointer-events-none flex items-center space-x-0.5">
+                              <span>🧱</span>
+                              <span className="truncate max-w-[60px]">{dev.roomName || 'Pared'}</span>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -549,30 +746,76 @@ export default function Paso5DisenoRouter() {
 
             {/* Right: Wall Generator & Router Management */}
             <div className="lg:col-span-4 space-y-4">
-              {/* Add Router Card if none placed */}
-              <div className="bg-[#FFF8F5] border border-[#ff5500]/25 rounded-2xl p-4 shadow-sm">
-                <div className="flex items-center justify-between mb-2">
+              {/* 1. Router WIN Card with Wall Snapping & Room Picker */}
+              <div className="bg-[#FFF8F5] border border-[#ff5500]/25 rounded-2xl p-4 shadow-sm space-y-3">
+                <div className="flex items-center justify-between">
                   <h3 className="font-bold text-slate-900 text-sm flex items-center space-x-1.5">
                     <span>📡</span>
                     <span>Router Fibra WIN</span>
                   </h3>
                   <span className="text-[11px] font-extrabold px-2 py-0.5 bg-[#ff5500] text-white rounded-full">
-                    {routerCount > 0 ? '1 colocado' : 'Pendiente'}
+                    {routerDevice ? '1 en pared' : 'Pendiente'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-600 mb-3">
-                  {routerCount > 0
-                    ? 'Tu Router está activo en el plano. Puedes moverlo arrastrándolo a la habitación deseada.'
-                    : 'Coloca tu router en el centro de tu casa para maximizar la cobertura.'}
+
+                <p className="text-xs text-slate-600">
+                  {routerDevice
+                    ? `Tu router está encajado en la pared de ${routerDevice.roomName || 'la habitación'}. Al arrastrarlo se adherirá automáticamente a la pared más próxima.`
+                    : 'Coloca tu router en una pared de la habitación principal para maximizar la cobertura.'}
                 </p>
-                {routerCount === 0 && (
+
+                {routerDevice ? (
+                  <div className="bg-white/80 border border-[#ff5500]/30 rounded-xl p-2.5 text-xs text-slate-700 flex items-center justify-between">
+                    <span className="font-semibold truncate">
+                      📍 {routerDevice.snappedWall || `Pared de ${routerDevice.roomName}`}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPlacedElements((prev) => prev.filter((el) => el.id !== routerDevice.id));
+                        setSelectedElementId(null);
+                        showFeedback('Router retirado del plano');
+                      }}
+                      className="text-rose-500 hover:text-rose-700 text-xs font-bold ml-2 cursor-pointer"
+                      title="Quitar router"
+                    >
+                      Quitar ✕
+                    </button>
+                  </div>
+                ) : (
                   <button
                     type="button"
-                    onClick={handleAddRouter}
+                    onClick={() => handleAddRouter()}
                     className="w-full py-2.5 bg-[#ff5500] hover:bg-[#e64d00] text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center space-x-1.5 shadow-md shadow-[#ff5500]/20"
                   >
-                    <span>+ Colocar Router WIN en plano</span>
+                    <span>+ Colocar Router WIN en pared</span>
                   </button>
+                )}
+
+                {/* Quick Room Placement Buttons */}
+                {rooms.length > 0 && (
+                  <div className="pt-2 border-t border-[#ff5500]/15 space-y-1.5">
+                    <span className="text-[11px] font-bold text-slate-600 block">
+                      📍 Ubicar router directamente en pared de:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {rooms.map((room) => (
+                        <button
+                          key={room.id}
+                          type="button"
+                          onClick={() => handleAddRouter(room)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer flex items-center space-x-1 ${
+                            routerDevice?.roomName === room.name
+                              ? 'bg-[#ff5500] text-white border-[#ff5500]'
+                              : 'bg-white text-slate-700 border-slate-200 hover:border-[#ff5500]'
+                          }`}
+                        >
+                          <span>{room.emoji}</span>
+                          <span>{room.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
 

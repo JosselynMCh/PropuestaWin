@@ -10,6 +10,7 @@ export default function Paso6Cobertura() {
     selectedFloors,
     currentFloorView,
     setCurrentFloorView,
+    getAvailableFloors,
     placedElements,
     placedWalls,
   } = useSimulator();
@@ -29,10 +30,14 @@ export default function Paso6Cobertura() {
     canvasW = maxCanvasH * aspectRatio;
   }
 
-  // Find placed router or default to center
+  // Find placed router and repeater
   const router = placedElements.find((el) => el.itemId === 'router');
   const routerX = router ? router.x + router.w / 2 : canvasW / 2;
   const routerY = router ? router.y + router.h / 2 : canvasH / 2;
+
+  const repeater = placedElements.find((el) => el.itemId === 'mesh-repeater');
+  const repeaterX = repeater ? repeater.x + repeater.w / 2 : null;
+  const repeaterY = repeater ? repeater.y + repeater.h / 2 : null;
 
   // Filter room elements
   const rooms = placedElements.filter((el) => el.type === 'room');
@@ -62,13 +67,13 @@ export default function Paso6Cobertura() {
             </div>
 
             {selectedFloors !== '1' && (
-              <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-2xl">
-                {['Primer piso', 'Segundo piso'].map((floor) => (
+              <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-2xl">
+                {getAvailableFloors().map((floor) => (
                   <button
                     key={floor}
                     type="button"
                     onClick={() => setCurrentFloorView(floor)}
-                    className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition ${
+                    className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer ${
                       currentFloorView === floor
                         ? 'bg-white text-[#ff5500] shadow-sm'
                         : 'text-slate-600 hover:text-slate-900'
@@ -110,6 +115,20 @@ export default function Paso6Cobertura() {
                     }}
                   />
 
+                  {/* Additional Heatmap radial gradient centered on Repeater (if placed) */}
+                  {repeater && repeaterX !== null && (
+                    <div
+                      className="absolute inset-0 pointer-events-none z-12 transition-opacity duration-300"
+                      style={{
+                        background: `radial-gradient(circle 350px at ${repeaterX}px ${repeaterY}px, 
+                          rgba(16, 185, 129, 0.48) 0%, 
+                          rgba(16, 185, 129, 0.32) 40%, 
+                          rgba(234, 179, 8, 0.18) 75%, 
+                          transparent 100%)`,
+                      }}
+                    />
+                  )}
+
                   {/* Signal Pulse Rings at Router coordinates */}
                   <div
                     className="absolute pointer-events-none -translate-x-1/2 -translate-y-1/2 z-10"
@@ -129,6 +148,17 @@ export default function Paso6Cobertura() {
                   >
                     <div className="w-72 h-72 rounded-full border border-amber-400/30" />
                   </div>
+
+                  {/* Signal Pulse Rings at Repeater coordinates */}
+                  {repeater && repeaterX !== null && (
+                    <div
+                      className="absolute pointer-events-none -translate-x-1/2 -translate-y-1/2 z-10"
+                      style={{ left: `${repeaterX}px`, top: `${repeaterY}px` }}
+                    >
+                      <div className="w-20 h-20 rounded-full border-2 border-emerald-400/70 animate-ping" />
+                      <div className="w-40 h-40 rounded-full border border-emerald-400/50" />
+                    </div>
+                  )}
 
                   {/* User Placed Rooms */}
                   {rooms.map((room) => (
@@ -180,15 +210,38 @@ export default function Paso6Cobertura() {
                       top: `${routerY - 22}px`,
                     }}
                     className="absolute z-30 w-11 h-11 bg-white rounded-2xl border-2 border-[#ff5500] shadow-xl flex items-center justify-center pointer-events-none"
+                    title="Router WIN"
                   >
                     <span className="text-xl">📡</span>
                   </div>
+
+                  {/* Repeater Indicator (if placed) */}
+                  {repeater && repeaterX !== null && (
+                    <div
+                      style={{
+                        left: `${repeaterX - 20}px`,
+                        top: `${repeaterY - 20}px`,
+                      }}
+                      className="absolute z-30 w-10 h-10 bg-emerald-950 text-white rounded-2xl border-2 border-emerald-400 shadow-xl flex items-center justify-center pointer-events-none text-lg"
+                      title="Repetidor Mesh WIN"
+                    >
+                      <span>🔁</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="mt-3 flex items-center space-x-2 text-xs text-slate-500">
-                <span className="font-semibold text-slate-700">📌 Ubicación del Router:</span>
-                <span>{router ? 'Posicionado según el paso 5' : 'Centro de la vivienda (por defecto)'}</span>
+              <div className="mt-3 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2 w-full px-2">
+                <div className="flex items-center space-x-1.5">
+                  <span className="font-semibold text-slate-700">📌 Router WIN:</span>
+                  <span>{router ? (router.snappedWall || `En ${router.roomName || 'plano'}`) : 'Centro de la vivienda'}</span>
+                </div>
+                {repeater && (
+                  <div className="flex items-center space-x-1.5 text-emerald-700 font-bold">
+                    <span>🔁 Repetidor Mesh:</span>
+                    <span>{repeater.snappedWall || `En ${repeater.roomName || 'plano'}`} {repeater.hasEthernet ? '(Cable Ethernet)' : '(Wi-Fi)'}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -223,26 +276,49 @@ export default function Paso6Cobertura() {
                 </div>
               </div>
 
-              {/* Repeater Suggestion Card */}
-              <div className="bg-white border border-[#ff5500]/30 rounded-2xl p-4 shadow-sm space-y-3">
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl">🚀</span>
-                  <h4 className="font-bold text-slate-900 text-xs">¿Tienes esquinas con señal débil?</h4>
+              {/* Repeater Card (Adaptive if already active vs suggested) */}
+              {repeater ? (
+                <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-4 shadow-sm space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl">✨</span>
+                    <h4 className="font-bold text-emerald-950 text-xs">Repetidor Mesh WIN Conectado</h4>
+                  </div>
+                  <p className="text-xs text-emerald-800 leading-relaxed">
+                    La señal se encuentra amplificada al 100% de cobertura simétrica en todas las áreas previamente lejanas.
+                    {repeater.hasEthernet && ' Conexión por cable Ethernet (Backhaul) habilitada.'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/paso-7')}
+                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-full shadow-md shadow-emerald-600/20 transition flex items-center justify-center space-x-2 cursor-pointer"
+                  >
+                    <span>Ajustar parámetros Mesh</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </button>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Para casas de {selectedFloors} piso(s) o paredes gruesas, recomendamos conectar un Repetidor Mesh WIN para llevar la señal al 100%.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => navigate('/paso-7')}
-                  className="w-full py-3 bg-[#ff5500] hover:bg-[#e64d00] text-white font-bold text-xs rounded-full shadow-md shadow-[#ff5500]/20 transition flex items-center justify-center space-x-2 cursor-pointer"
-                >
-                  <span>Ver recomendación Mesh WIN</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </button>
-              </div>
+              ) : (
+                <div className="bg-white border border-[#ff5500]/30 rounded-2xl p-4 shadow-sm space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl">🚀</span>
+                    <h4 className="font-bold text-slate-900 text-xs">¿Tienes esquinas con señal débil?</h4>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Para casas de {selectedFloors} piso(s) o paredes gruesas, recomendamos conectar un Repetidor Mesh WIN para llevar la señal al 100%.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/paso-7')}
+                    className="w-full py-3 bg-[#ff5500] hover:bg-[#e64d00] text-white font-bold text-xs rounded-full shadow-md shadow-[#ff5500]/20 transition flex items-center justify-center space-x-2 cursor-pointer"
+                  >
+                    <span>Ver recomendación Mesh WIN</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
