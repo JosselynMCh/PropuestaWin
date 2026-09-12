@@ -163,7 +163,7 @@ export default function Sidebar({ currentStep = 1 }) {
                   onClick={() => {
                     if (isUnlocked) handleNavigate(item.path);
                   }}
-                  className={`w-full text-left flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 ${
+                  className={`w-full text-left flex items-center justify-between px-3 py-3.5 sm:py-3 rounded-xl transition-all duration-200 ${
                     !isUnlocked
                       ? 'opacity-40 cursor-not-allowed bg-black/5 text-white/60'
                       : active

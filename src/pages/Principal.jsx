@@ -16,9 +16,9 @@ export default function Principal() {
       {/* Main Content Area */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center flex-1 my-auto">
         {/* Left Column: Headline, Description & CTA */}
-        <div className="lg:col-span-6 xl:col-span-5 space-y-6 z-10">
+        <div className="lg:col-span-6 xl:col-span-5 space-y-6 z-10 flex flex-col items-center lg:items-start text-center lg:text-left mt-4 lg:mt-0">
           <h2 className="text-3xl sm:text-4xl lg:text-[42px] xl:text-[46px] font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-            Conecta tu hogar <br />
+            Conecta tu hogar <br className="hidden sm:block" />
             con la mejor{' '}
             <span className="text-[#ff5500]">cobertura de internet</span>
           </h2>
@@ -27,10 +27,10 @@ export default function Principal() {
             Diseña tu casa, coloca tus dispositivos y descubre hasta dónde llega la señal de WIN.
           </p>
 
-          <div className="pt-2">
+          <div className="pt-2 w-full flex justify-center lg:justify-start">
             <button
               onClick={handleStart}
-              className="inline-flex items-center justify-center space-x-2.5 px-9 py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-base group"
+              className="inline-flex items-center justify-center space-x-2.5 px-9 py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-base sm:text-lg w-full sm:w-auto group"
             >
               <span>Comenzar</span>
               <svg

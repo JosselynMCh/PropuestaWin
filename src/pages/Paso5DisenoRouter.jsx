@@ -40,11 +40,11 @@ export default function Paso5DisenoRouter() {
   const lengthM = houseLength && houseLength > 0 ? houseLength : 15;
 
   // Responsive canvas sizing
-  const [containerWidth, setContainerWidth] = useState(580);
-  useEffect(() => {
+  const [containerWidth, setContainerWidth] = useState(600);
+  React.useLayoutEffect(() => {
     const updateSize = () => {
       if (canvasContainerRef.current) {
-        const w = canvasContainerRef.current.clientWidth - 40;
+        const w = canvasContainerRef.current.clientWidth - 48;
         setContainerWidth(Math.max(260, w));
       }
     };
@@ -53,8 +53,8 @@ export default function Paso5DisenoRouter() {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  const maxCanvasW = Math.min(580, containerWidth);
-  const maxCanvasH = Math.min(410, maxCanvasW * 0.75);
+  const maxCanvasW = Math.min(600, containerWidth);
+  const maxCanvasH = Math.min(430, maxCanvasW * 0.75);
   const aspectRatio = widthM / lengthM;
 
   let canvasW = maxCanvasW;
@@ -613,7 +613,7 @@ export default function Paso5DisenoRouter() {
                           }`}
                         >
                           <span className="font-extrabold text-[9px] sm:text-xs text-slate-800 tracking-tight truncate pointer-events-none">
-                            {el.emoji} {el.name}
+                            <span>{el.name}</span>
                           </span>
                           <span className="text-[10px] font-bold text-slate-400 text-center pointer-events-none">
                             {Math.round((el.w / canvasW) * widthM)}x{Math.round((el.h / canvasH) * lengthM)}m
@@ -626,7 +626,7 @@ export default function Paso5DisenoRouter() {
                               handleToggleRoomEdgeWall(el, 'top');
                             }}
                             title="Haz clic para agregar o quitar pared en este borde"
-                            className="absolute -top-1.5 left-2 right-2 h-3.5 bg-slate-400/0 hover:bg-[#ff5500]/60 rounded-full cursor-pointer flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-30"
+                            className="absolute -top-2.5 sm:-top-1.5 left-2 right-2 h-5 sm:h-3.5 bg-slate-400/0 hover:bg-[#ff5500]/60 rounded-full cursor-pointer flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-30"
                           >
                             <span className="text-[9px] font-black text-white bg-slate-900 px-1 rounded shadow-xs">
                               + pared
@@ -640,7 +640,7 @@ export default function Paso5DisenoRouter() {
                               handleToggleRoomEdgeWall(el, 'bottom');
                             }}
                             title="Haz clic para agregar o quitar pared en este borde"
-                            className="absolute -bottom-1.5 left-2 right-2 h-3.5 bg-slate-400/0 hover:bg-[#ff5500]/60 rounded-full cursor-pointer flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-30"
+                            className="absolute -bottom-2.5 sm:-bottom-1.5 left-2 right-2 h-5 sm:h-3.5 bg-slate-400/0 hover:bg-[#ff5500]/60 rounded-full cursor-pointer flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-30"
                           >
                             <span className="text-[9px] font-black text-white bg-slate-900 px-1 rounded shadow-xs">
                               + pared
@@ -654,7 +654,7 @@ export default function Paso5DisenoRouter() {
                               handleToggleRoomEdgeWall(el, 'left');
                             }}
                             title="Haz clic para agregar o quitar pared en este borde"
-                            className="absolute -left-1.5 top-2 bottom-2 w-3.5 bg-slate-400/0 hover:bg-[#ff5500]/60 rounded-full cursor-pointer flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-30"
+                            className="absolute -left-2.5 sm:-left-1.5 top-2 bottom-2 w-5 sm:w-3.5 bg-slate-400/0 hover:bg-[#ff5500]/60 rounded-full cursor-pointer flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-30"
                           >
                             <span className="text-[8px] font-black text-white bg-slate-900 px-0.5 rounded shadow-xs rotate-90">
                               + pared
@@ -668,7 +668,7 @@ export default function Paso5DisenoRouter() {
                               handleToggleRoomEdgeWall(el, 'right');
                             }}
                             title="Haz clic para agregar o quitar pared en este borde"
-                            className="absolute -right-1.5 top-2 bottom-2 w-3.5 bg-slate-400/0 hover:bg-[#ff5500]/60 rounded-full cursor-pointer flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-30"
+                            className="absolute -right-2.5 sm:-right-1.5 top-2 bottom-2 w-5 sm:w-3.5 bg-slate-400/0 hover:bg-[#ff5500]/60 rounded-full cursor-pointer flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-30"
                           >
                             <span className="text-[8px] font-black text-white bg-slate-900 px-0.5 rounded shadow-xs rotate-90">
                               + pared
@@ -738,7 +738,7 @@ export default function Paso5DisenoRouter() {
                             </span>
                           </div>
                           <span className="text-sm pointer-events-none leading-none mt-0.5">
-                            {dev.emoji || '📶'}
+                            <span className="font-bold">Router</span>
                           </span>
 
                           {/* Wall Snapped badge */}
@@ -756,7 +756,7 @@ export default function Paso5DisenoRouter() {
 
               {/* Canvas controls & tip */}
               <div className="mt-3 flex items-center justify-between w-full text-xs text-slate-500 px-2 flex-wrap gap-2">
-                <span>💡 Arrastra el <b>Router</b> o las <b>Paredes</b> para ubicarlos libremente.</span>
+                <span>Arrastra el <b>Router</b> o las <b>Paredes</b> para ubicarlos libremente.</span>
                 {selectedWallId && (
                   <div className="flex items-center space-x-2">
                     <button
@@ -764,14 +764,14 @@ export default function Paso5DisenoRouter() {
                       onClick={handleRotateSelectedWall}
                       className="px-2.5 py-1 bg-white border border-slate-300 hover:border-[#ff5500] rounded-lg font-bold text-[#ff5500] cursor-pointer"
                     >
-                      🔄 Girar pared
+                      Girar pared
                     </button>
                     <button
                       type="button"
                       onClick={handleDeleteSelectedWall}
                       className="px-2.5 py-1 bg-rose-50 border border-rose-200 hover:bg-rose-100 rounded-lg font-bold text-rose-600 cursor-pointer"
                     >
-                      🗑️ Quitar pared
+                      Quitar pared
                     </button>
                   </div>
                 )}
@@ -798,7 +798,6 @@ export default function Paso5DisenoRouter() {
               <div className="p-4 space-y-3 bg-[#FFFBF9]">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-base">📡</span>
                     <div>
                       <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm">
                         Router WIN Fibra
@@ -822,7 +821,6 @@ export default function Paso5DisenoRouter() {
                 {routerDevice ? (
                   <div className="bg-white border border-[#ff5500]/30 rounded-xl p-2.5 shadow-2xs flex items-center justify-between">
                     <div className="flex items-center space-x-2 truncate">
-                      <span className="text-[#ff5500] font-black text-xs">📍</span>
                       <span className="text-xs font-bold text-slate-800 truncate">
                         {routerDevice.snappedWall || `Pared de ${routerDevice.roomName || 'Habitación'}`}
                       </span>
@@ -870,7 +868,6 @@ export default function Paso5DisenoRouter() {
                                 : 'bg-white text-slate-700 border-slate-200 hover:border-[#ff5500] hover:bg-amber-50/50'
                             }`}
                           >
-                            <span>{room.emoji}</span>
                             <span>{room.name}</span>
                           </button>
                         );
@@ -884,7 +881,6 @@ export default function Paso5DisenoRouter() {
               <div className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-base">🧱</span>
                     <div>
                       <h4 className="font-extrabold text-slate-900 text-xs">
                         Material de Paredes
@@ -910,8 +906,7 @@ export default function Paso5DisenoRouter() {
                             : 'border-slate-200 hover:border-slate-300 bg-white'
                         }`}
                       >
-                        <div className="flex items-center justify-between w-full mb-1">
-                          <span className="text-base leading-none">{mat.icon}</span>
+                        <div className="flex items-center justify-end w-full mb-1">
                           <span className={`w-2.5 h-2.5 rounded-full ${mat.color}`} />
                         </div>
                         <div>
@@ -946,7 +941,6 @@ export default function Paso5DisenoRouter() {
                     onClick={handleAutoBorderRooms}
                     className="w-full py-2.5 px-3 bg-white border border-[#ff5500] hover:bg-[#ff5500] text-[#ff5500] hover:text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center space-x-2 shadow-2xs group"
                   >
-                    <span className="group-hover:scale-110 transition-transform">⚡</span>
                     <span>Paredes a todas las habitaciones (1 clic)</span>
                   </button>
                 )}
@@ -989,7 +983,6 @@ export default function Paso5DisenoRouter() {
 
                 {/* Quick Hint Banner */}
                 <div className="bg-amber-50/90 border border-amber-200/80 rounded-xl p-2.5 flex items-start space-x-2 text-[11px] text-amber-900">
-                  <span className="text-xs mt-0.5">👆</span>
                   <p className="leading-snug">
                     <b>Tip directo:</b> Pasa el cursor por cualquier borde de una habitación en el plano y haz clic en <b>+ pared</b> para ponerla o quitarla al instante.
                   </p>
@@ -1010,18 +1003,18 @@ export default function Paso5DisenoRouter() {
       </div>
 
       {/* Bottom Actions */}
-      <div className="flex items-center justify-between mt-6 sm:mt-8 pb-4 px-2 sm:px-0 gap-2">
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-between mt-6 sm:mt-8 pb-4 px-2 sm:px-0 gap-3 sm:gap-2">
         <button
           type="button"
           onClick={() => navigate('/paso-4')}
-          className="px-4 sm:px-7 py-2.5 sm:py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 text-slate-600 font-bold rounded-full transition cursor-pointer text-xs sm:text-sm"
+          className="w-full sm:w-auto px-4 sm:px-7 py-2.5 sm:py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 text-slate-600 font-bold rounded-full transition cursor-pointer text-xs sm:text-sm"
         >
           Atrás
         </button>
         <button
           type="button"
           onClick={() => navigate('/paso-6')}
-          className="inline-flex items-center space-x-1.5 sm:space-x-2 px-5 sm:px-9 py-2.5 sm:py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-sm sm:text-base group"
+          className="w-full sm:w-auto inline-flex items-center justify-center space-x-1.5 sm:space-x-2 px-5 sm:px-9 py-2.5 sm:py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-sm sm:text-base group"
         >
           <span>Simular Cobertura</span>
           <svg

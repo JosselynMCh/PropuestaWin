@@ -38,7 +38,7 @@ export default function Paso4Plano() {
   // Responsive canvas sizing
   const [containerWidth, setContainerWidth] = useState(600);
 
-  useEffect(() => {
+  React.useLayoutEffect(() => {
     const updateSize = () => {
       if (canvasContainerRef.current) {
         const w = canvasContainerRef.current.clientWidth - 48; // padding
@@ -289,7 +289,7 @@ export default function Paso4Plano() {
         {hasOverlaps && (
           <div className="mb-4 mx-2 sm:mx-0 bg-amber-50 border-2 border-amber-400/80 rounded-2xl p-3 sm:p-4 flex items-center justify-between shadow-sm animate-pulse">
             <div className="flex items-center space-x-3">
-              <span className="text-2xl">⚠️</span>
+              <span className="text-2xl font-black text-rose-600">!</span>
               <div>
                 <h4 className="text-xs sm:text-sm font-bold text-amber-900">
                   ¡Atención! Hay componentes superpuestos en el plano
@@ -347,7 +347,7 @@ export default function Paso4Plano() {
                   onClick={handleDeleteSelected}
                   className="px-2 sm:px-3.5 py-1 sm:py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold rounded-full text-[10px] sm:text-xs transition flex items-center space-x-1 cursor-pointer"
                 >
-                  <span>Eliminar 🗑️</span>
+                  <span>Eliminar</span>
                 </button>
               )}
               {placedElements.length > 0 && (
@@ -438,8 +438,8 @@ export default function Paso4Plano() {
                         {/* Element Title & Emoji */}
                         <div className="flex items-center justify-between pointer-events-none">
                           <span className="font-extrabold text-[9px] sm:text-xs text-slate-800 tracking-tight truncate flex items-center space-x-0.5 sm:space-x-1">
-                            {isOverlapping && <span className="text-rose-600 font-black">⚠️</span>}
-                            <span>{el.emoji} {el.name}</span>
+                            {isOverlapping && <span className="text-rose-600 font-black">!</span>}
+                            <span>{el.name}</span>
                           </span>
                           {el.type === 'device' && (
                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -470,7 +470,7 @@ export default function Paso4Plano() {
                             <div
                               onMouseDown={(e) => handleMouseDown(e, el, 'resize', 'nw')}
                               onTouchStart={(e) => handleMouseDown(e, el, 'resize', 'nw')}
-                              className="absolute -top-2 -left-2 w-4 h-4 sm:w-5 sm:h-5 bg-white border-2 border-[#ff5500] rounded-full cursor-nwse-resize shadow-md hover:scale-125 transition-transform z-40 flex items-center justify-center"
+                              className="absolute -top-3 -left-3 w-6 h-6 sm:w-5 sm:h-5 bg-white border-2 border-[#ff5500] rounded-full cursor-nwse-resize shadow-md hover:scale-125 transition-transform z-40 flex items-center justify-center"
                             >
                               <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#ff5500] rounded-full"></div>
                             </div>
@@ -478,7 +478,7 @@ export default function Paso4Plano() {
                             <div
                               onMouseDown={(e) => handleMouseDown(e, el, 'resize', 'ne')}
                               onTouchStart={(e) => handleMouseDown(e, el, 'resize', 'ne')}
-                              className="absolute -top-2 -right-2 w-4 h-4 sm:w-5 sm:h-5 bg-white border-2 border-[#ff5500] rounded-full cursor-nesw-resize shadow-md hover:scale-125 transition-transform z-40 flex items-center justify-center"
+                              className="absolute -top-3 -right-3 w-6 h-6 sm:w-5 sm:h-5 bg-white border-2 border-[#ff5500] rounded-full cursor-nesw-resize shadow-md hover:scale-125 transition-transform z-40 flex items-center justify-center"
                             >
                               <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#ff5500] rounded-full"></div>
                             </div>
@@ -486,7 +486,7 @@ export default function Paso4Plano() {
                             <div
                               onMouseDown={(e) => handleMouseDown(e, el, 'resize', 'sw')}
                               onTouchStart={(e) => handleMouseDown(e, el, 'resize', 'sw')}
-                              className="absolute -bottom-2 -left-2 w-4 h-4 sm:w-5 sm:h-5 bg-white border-2 border-[#ff5500] rounded-full cursor-nesw-resize shadow-md hover:scale-125 transition-transform z-40 flex items-center justify-center"
+                              className="absolute -bottom-3 -left-3 w-6 h-6 sm:w-5 sm:h-5 bg-white border-2 border-[#ff5500] rounded-full cursor-nesw-resize shadow-md hover:scale-125 transition-transform z-40 flex items-center justify-center"
                             >
                               <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#ff5500] rounded-full"></div>
                             </div>
@@ -494,7 +494,7 @@ export default function Paso4Plano() {
                             <div
                               onMouseDown={(e) => handleMouseDown(e, el, 'resize', 'se')}
                               onTouchStart={(e) => handleMouseDown(e, el, 'resize', 'se')}
-                              className="absolute -bottom-2 -right-2 w-4 h-4 sm:w-5 sm:h-5 bg-white border-2 border-[#ff5500] rounded-full cursor-nwse-resize shadow-md hover:scale-125 transition-transform z-40 flex items-center justify-center"
+                              className="absolute -bottom-3 -right-3 w-6 h-6 sm:w-5 sm:h-5 bg-white border-2 border-[#ff5500] rounded-full cursor-nwse-resize shadow-md hover:scale-125 transition-transform z-40 flex items-center justify-center"
                             >
                               <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#ff5500] rounded-full"></div>
                             </div>
@@ -530,7 +530,7 @@ export default function Paso4Plano() {
                     className="p-2 sm:p-3 bg-white rounded-lg sm:rounded-xl border border-slate-200/90 hover:border-[#ff5500] hover:shadow-md flex flex-col items-center text-center cursor-pointer active:scale-95 transition-all group"
                   >
                     <span className="text-lg sm:text-2xl mb-0.5 sm:mb-1 group-hover:scale-110 transition-transform">
-                      {item.emoji}
+                      <span>+</span>
                     </span>
                     <span className="font-bold text-[10px] sm:text-xs text-slate-800">{item.name}</span>
                     <span className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 hidden sm:block">+ Agregar</span>
@@ -551,18 +551,18 @@ export default function Paso4Plano() {
       </div>
 
       {/* Bottom Actions */}
-      <div className="flex items-center justify-between mt-6 sm:mt-8 pb-4 px-2 sm:px-0 gap-2">
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-between mt-6 sm:mt-8 pb-4 px-2 sm:px-0 gap-3 sm:gap-2">
         <button
           type="button"
           onClick={() => navigate('/paso-3')}
-          className="px-4 sm:px-7 py-2.5 sm:py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 text-slate-600 font-bold rounded-full transition cursor-pointer text-xs sm:text-sm"
+          className="w-full sm:w-auto px-4 sm:px-7 py-2.5 sm:py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 text-slate-600 font-bold rounded-full transition cursor-pointer text-xs sm:text-sm"
         >
           Atrás
         </button>
 
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 flex-wrap justify-end w-full sm:w-auto">
           {hasOverlaps && (
-            <span className="text-[10px] sm:text-xs font-bold text-rose-600 bg-rose-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-rose-200">
+            <span className="text-[10px] sm:text-xs font-bold text-rose-600 bg-rose-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-rose-200 text-center w-full sm:w-auto">
               Separa componentes superpuestos
             </span>
           )}
@@ -573,7 +573,7 @@ export default function Paso4Plano() {
               if (hasOverlaps) return;
               navigate('/paso-5');
             }}
-            className={`inline-flex items-center space-x-1.5 sm:space-x-2 px-5 sm:px-9 py-2.5 sm:py-3.5 font-bold rounded-full shadow-lg transition duration-200 text-sm sm:text-base group ${
+            className={`w-full sm:w-auto inline-flex items-center justify-center space-x-1.5 sm:space-x-2 px-5 sm:px-9 py-2.5 sm:py-3.5 font-bold rounded-full shadow-lg transition duration-200 text-sm sm:text-base group ${
               hasOverlaps
                 ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
                 : 'bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white shadow-[#ff5500]/25 cursor-pointer'

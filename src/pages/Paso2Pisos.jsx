@@ -113,7 +113,7 @@ export default function Paso2Pisos() {
           </div>
 
           {/* Grid of 4 Floor Cards with Friendly Micro-interactions */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {floorOptions.map((card) => {
               const isChecked = selectedFloors === card.val;
               return (
@@ -171,18 +171,18 @@ export default function Paso2Pisos() {
       </div>
 
       {/* Bottom Actions */}
-      <div className="flex items-center justify-between mt-8 pb-4">
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 sm:gap-0 mt-8 pb-4">
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="px-7 py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 text-slate-600 font-bold rounded-full transition cursor-pointer text-sm"
+          className="w-full sm:w-auto px-7 py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 text-slate-600 font-bold rounded-full transition cursor-pointer text-sm"
         >
           Atrás
         </button>
         <button
           type="button"
           onClick={() => navigate('/paso-3')}
-          className="inline-flex items-center space-x-2 px-9 py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-base group"
+          className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-9 py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-base group"
         >
           <span>Siguiente</span>
           <svg

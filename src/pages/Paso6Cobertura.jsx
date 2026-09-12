@@ -28,8 +28,23 @@ export default function Paso6Cobertura() {
   const widthM = houseWidth && houseWidth > 0 ? houseWidth : 10;
   const lengthM = houseLength && houseLength > 0 ? houseLength : 15;
 
-  const maxCanvasW = 580;
-  const maxCanvasH = 410;
+  const [containerWidth, setContainerWidth] = useState(600);
+  const canvasContainerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const updateSize = () => {
+      if (canvasContainerRef.current) {
+        const w = canvasContainerRef.current.clientWidth - 48; // padding
+        setContainerWidth(Math.max(260, w));
+      }
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  const maxCanvasW = Math.min(600, containerWidth);
+  const maxCanvasH = Math.min(430, maxCanvasW * 0.75);
   const aspectRatio = widthM / lengthM;
 
   let canvasW = maxCanvasW;
@@ -151,7 +166,6 @@ export default function Paso6Cobertura() {
         {feedbackMessage && (
           <div className="mb-4 p-3 bg-emerald-50 border border-emerald-300 rounded-2xl flex items-center justify-between shadow-xs">
             <div className="flex items-center space-x-2 text-xs font-bold text-emerald-800">
-              <span className="text-base">✨</span>
               <span>{feedbackMessage}</span>
             </div>
             <button
@@ -196,9 +210,9 @@ export default function Paso6Cobertura() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+          <div className="flex flex-col lg:flex-row lg:gap-6 gap-4 items-start">
             {/* Left: Custom Blueprint & Wi-Fi Heatmap */}
-            <div className="lg:col-span-8 flex flex-col items-center">
+            <div className="lg:flex-[2] w-full flex flex-col items-center">
               <div className="w-full flex items-center justify-between text-xs text-slate-500 font-medium mb-2 px-1">
                 <span>Plano: <b>{widthM}m × {lengthM}m</b> ({widthM * lengthM} m²)</span>
                 <span className="text-[#ff5500] font-semibold flex items-center gap-1.5">
@@ -207,7 +221,7 @@ export default function Paso6Cobertura() {
                 </span>
               </div>
 
-              <div className="w-full flex items-center justify-center p-3 sm:p-4 bg-slate-50/70 border border-slate-200/80 rounded-2xl overflow-auto">
+              <div ref={canvasContainerRef} className="w-full flex items-center justify-center p-2 sm:p-3 bg-slate-50/70 border border-slate-200/80 rounded-xl sm:rounded-2xl overflow-x-auto">
                 <div
                   style={{ width: `${canvasW}px`, height: `${canvasH}px` }}
                   className="relative rounded-2xl border-2 border-slate-300 bg-white shadow-md overflow-hidden flex-shrink-0 select-none"
@@ -283,7 +297,7 @@ export default function Paso6Cobertura() {
                       className={`absolute rounded-xl border border-dashed ${room.border} ${room.bg} flex flex-col justify-between p-2 shadow-xs`}
                     >
                       <div className="flex items-center space-x-1">
-                        <span className="text-base">{room.emoji}</span>
+
                         <span className="font-bold text-[11px] text-slate-800 truncate">{room.name}</span>
                       </div>
                     </div>
@@ -322,7 +336,7 @@ export default function Paso6Cobertura() {
                     className="absolute z-30 w-11 h-11 bg-white rounded-2xl border-2 border-[#ff5500] shadow-xl flex items-center justify-center pointer-events-none"
                     title="Router WIN"
                   >
-                    <span className="text-xl">📡</span>
+                    <span className="text-xs font-bold text-slate-800">Router</span>
                   </div>
 
                   {/* Repeater Indicator (if placed) */}
@@ -335,7 +349,7 @@ export default function Paso6Cobertura() {
                       className="absolute z-30 w-10 h-10 bg-emerald-950 text-white rounded-2xl border-2 border-emerald-400 shadow-xl flex items-center justify-center pointer-events-none text-lg animate-pulse"
                       title="Repetidor Mesh WIN"
                     >
-                      <span>🔁</span>
+                      <span className="text-xs font-bold">Mesh</span>
                     </div>
                   )}
 
@@ -359,24 +373,24 @@ export default function Paso6Cobertura() {
               {/* Status bar under map */}
               <div className="mt-3 flex items-center justify-between text-xs text-slate-600 flex-wrap gap-2 w-full px-2">
                 <div className="flex items-center space-x-1.5">
-                  <span className="font-bold text-slate-800">📡 Router:</span>
+                  <span className="font-bold text-slate-800">Router:</span>
                   <span>{router ? (router.snappedWall || `En ${router.roomName || 'plano'}`) : 'Centro del hogar'}</span>
                 </div>
                 {repeater ? (
                   <div className="flex items-center space-x-1.5 text-emerald-700 font-bold">
-                    <span>🔁 Mesh:</span>
+                    <span>Mesh:</span>
                     <span>{repeater.snappedWall || `En ${repeater.roomName || 'plano'}`} {repeater.hasEthernet ? '(Cable Ethernet)' : '(Wi-Fi 6)'}</span>
                   </div>
                 ) : (
                   <span className="text-amber-700 font-semibold">
-                    ⚠️ Señal débil en áreas lejanas al router
+                    Señal débil en áreas lejanas al router
                   </span>
                 )}
               </div>
             </div>
 
             {/* Right: Unified Mesh & Coverage Legend Block */}
-            <div className="lg:col-span-4 bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-100 flex flex-col">
+            <div className="lg:flex-[1] w-full bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-100 flex flex-col">
               
               {/* Header */}
               <div className="bg-slate-50/80 px-4 py-3 border-b border-slate-200/80 flex items-center justify-between">
@@ -427,7 +441,6 @@ export default function Paso6Cobertura() {
               <div className="p-4 space-y-3 bg-[#FFFBF9]">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-base">🔁</span>
                     <h4 className="font-extrabold text-slate-900 text-xs">
                       Repetidor Mesh WIN
                     </h4>
@@ -447,11 +460,10 @@ export default function Paso6Cobertura() {
                 {recommendedRoom && !repeater && (
                   <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 text-[11px] text-amber-900 space-y-1">
                     <div className="font-bold flex items-center space-x-1 text-amber-950">
-                      <span>💡</span>
                       <span>Ubicación recomendada:</span>
                     </div>
                     <p className="leading-snug">
-                      Instalar en <b>{recommendedRoom.emoji} {recommendedRoom.name}</b> para eliminar la zona muerta y balancear la señal al 100%.
+                      Instalar en <b>{recommendedRoom.name}</b> para eliminar la zona muerta y balancear la señal al 100%.
                     </p>
                   </div>
                 )}
@@ -460,7 +472,7 @@ export default function Paso6Cobertura() {
                   <div className="space-y-2">
                     <div className="bg-white border border-emerald-300 rounded-xl p-2.5 shadow-2xs flex items-center justify-between">
                       <div className="flex items-center space-x-2 truncate">
-                        <span className="text-emerald-600 font-bold text-xs">✓</span>
+
                         <span className="text-xs font-bold text-slate-800 truncate">
                           {repeater.snappedWall || `En ${repeater.roomName || 'Pared'}`}
                         </span>
@@ -485,7 +497,6 @@ export default function Paso6Cobertura() {
                       }`}
                     >
                       <span className="flex items-center space-x-1.5">
-                        <span>🔌</span>
                         <span>Conexión por Cable (Ethernet)</span>
                       </span>
                       <span className={`text-[10px] px-2 py-0.5 rounded-full ${repeater.hasEthernet ? 'bg-emerald-600 text-white font-black' : 'bg-slate-200 text-slate-600'}`}>
@@ -517,7 +528,7 @@ export default function Paso6Cobertura() {
                               onClick={() => handleAddRepeater(room)}
                               className="px-2 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 hover:border-[#ff5500] text-slate-700 cursor-pointer flex items-center space-x-1 transition"
                             >
-                              <span>{room.emoji}</span>
+
                               <span>{room.name}</span>
                             </button>
                           ))}
