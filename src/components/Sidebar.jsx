@@ -126,15 +126,15 @@ export default function Sidebar({ currentStep = 1 }) {
       <div>
         {/* WIN Brandmark */}
         <div
-          className="mb-6 pt-1 cursor-pointer flex items-center justify-between bg-white/10 rounded-2xl p-3 border border-white/15 hover:bg-white/15 transition-all shadow-sm group"
+          className="mb-5 pt-1 px-1 cursor-pointer flex flex-col items-center justify-center gap-1.5 group"
           onClick={() => navigate('/')}
         >
           <img
             src="/img/logo_WIN_completo.png"
             alt="WIN Internet"
-            className="w-auto h-12 md:h-14 max-w-[140px] object-contain drop-shadow group-hover:scale-105 transition-transform"
+            className="w-full h-14 md:h-16 object-contain group-hover:scale-[1.03] transition-transform duration-200"
           />
-          <span className="text-[10px] uppercase tracking-wider font-extrabold bg-white/20 px-2 py-0.5 rounded-full text-white/95">
+          <span className="text-[10px] uppercase tracking-wider font-extrabold bg-white/20 px-2.5 py-0.5 rounded-full text-white self-center">
             Simulador
           </span>
         </div>
