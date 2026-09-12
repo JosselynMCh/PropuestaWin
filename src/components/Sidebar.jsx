@@ -130,8 +130,8 @@ export default function Sidebar({ currentStep = 1 }) {
           onClick={() => navigate('/')}
         >
           <img
-            src="/img/logo_WIN_completo.png"
-            alt="WIN Internet"
+            src="/img/logo_LOQ-WINS.png"
+            alt="Logo"
             className="w-full h-14 md:h-16 object-contain group-hover:scale-[1.03] transition-transform duration-200"
           />
           <span className="text-[10px] uppercase tracking-wider font-extrabold bg-white/20 px-2.5 py-0.5 rounded-full text-white self-center">
@@ -152,23 +152,21 @@ export default function Sidebar({ currentStep = 1 }) {
                 onClick={() => {
                   if (isUnlocked) navigate(item.path);
                 }}
-                className={`w-full text-left flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200 ${
-                  !isUnlocked
-                    ? 'opacity-40 cursor-not-allowed bg-black/5 text-white/60'
-                    : active
+                className={`w-full text-left flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200 ${!isUnlocked
+                  ? 'opacity-40 cursor-not-allowed bg-black/5 text-white/60'
+                  : active
                     ? 'bg-white text-[#ff5500] font-bold shadow-md shadow-black/10 translate-x-1 cursor-pointer'
                     : 'text-white/90 hover:text-white hover:bg-white/10 cursor-pointer'
-                }`}
+                  }`}
               >
                 <div className="flex items-center space-x-2.5 truncate">
                   <span
-                    className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                      active
-                        ? 'bg-[#ff5500] text-white'
-                        : isUnlocked
+                    className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${active
+                      ? 'bg-[#ff5500] text-white'
+                      : isUnlocked
                         ? 'bg-white/20 text-white'
                         : 'bg-black/15 text-white/60'
-                    }`}
+                      }`}
                   >
                     {item.step}
                   </span>
