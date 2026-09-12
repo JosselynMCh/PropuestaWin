@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../context/SimulatorContext';
 
@@ -32,14 +32,29 @@ export default function Paso5DisenoRouter() {
   const [feedbackMessage, setFeedbackMessage] = useState(null);
 
   const canvasRef = useRef(null);
-  const activeInteractionRef = useRef(null); // { type: 'moveElement' | 'moveWall', id, startX, startY, origX, origY }
+  const canvasContainerRef = useRef(null);
+  const activeInteractionRef = useRef(null);
 
   // Canvas scaling according to Paso 3 measurements
   const widthM = houseWidth && houseWidth > 0 ? houseWidth : 10;
   const lengthM = houseLength && houseLength > 0 ? houseLength : 15;
 
-  const maxCanvasW = 580;
-  const maxCanvasH = 410;
+  // Responsive canvas sizing
+  const [containerWidth, setContainerWidth] = useState(580);
+  useEffect(() => {
+    const updateSize = () => {
+      if (canvasContainerRef.current) {
+        const w = canvasContainerRef.current.clientWidth - 40;
+        setContainerWidth(Math.max(260, w));
+      }
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  const maxCanvasW = Math.min(580, containerWidth);
+  const maxCanvasH = Math.min(410, maxCanvasW * 0.75);
   const aspectRatio = widthM / lengthM;
 
   let canvasW = maxCanvasW;
@@ -345,11 +360,14 @@ export default function Paso5DisenoRouter() {
       setSelectedElementId(null);
     }
 
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
     activeInteractionRef.current = {
-      type, // 'element' | 'wall'
+      type,
       id: item.id,
-      startX: e.clientX,
-      startY: e.clientY,
+      startX: clientX,
+      startY: clientY,
       origX: item.x,
       origY: item.y,
       origW: item.w,
@@ -358,14 +376,26 @@ export default function Paso5DisenoRouter() {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleMouseUp);
+  };
+
+  const handleTouchMove = (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+    handleMouseMoveInternal(t.clientX, t.clientY);
   };
 
   const handleMouseMove = (e) => {
+    handleMouseMoveInternal(e.clientX, e.clientY);
+  };
+
+  const handleMouseMoveInternal = (clientX, clientY) => {
     const inter = activeInteractionRef.current;
     if (!inter) return;
 
-    const dx = e.clientX - inter.startX;
-    const dy = e.clientY - inter.startY;
+    const dx = clientX - inter.startX;
+    const dy = clientY - inter.startY;
 
     if (inter.type === 'element') {
       setPlacedElements((prev) =>
@@ -391,7 +421,6 @@ export default function Paso5DisenoRouter() {
   const handleMouseUp = () => {
     const inter = activeInteractionRef.current;
     if (inter && inter.type === 'element') {
-      // Auto-snap device to nearest wall on drop
       setPlacedElements((prev) =>
         prev.map((el) => {
           if (el.id === inter.id && el.type === 'device') {
@@ -413,6 +442,8 @@ export default function Paso5DisenoRouter() {
     activeInteractionRef.current = null;
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('mouseup', handleMouseUp);
+    window.removeEventListener('touchmove', handleTouchMove);
+    window.removeEventListener('touchend', handleMouseUp);
   };
 
   const handleDeleteSelectedWall = () => {
@@ -439,20 +470,20 @@ export default function Paso5DisenoRouter() {
 
 
   return (
-    <article className="step-view flex-1 flex flex-col justify-between max-w-6xl mx-auto w-full px-2 sm:px-4 py-2" id="step-view-5">
+    <article className="step-view flex-1 flex flex-col justify-between max-w-6xl mx-auto w-full px-0 sm:px-2 py-2" id="step-view-5">
       <div>
-        {/* Step Indicator Header matching WIN design system */}
-        <div className="flex items-center space-x-3 mb-5">
-          <span className="w-9 h-9 rounded-full bg-[#ff5500] text-white font-extrabold flex items-center justify-center text-base shadow-sm">
+        {/* Step Indicator Header */}
+        <div className="flex items-center space-x-3 mb-5 px-2 sm:px-0">
+          <span className="w-9 h-9 rounded-full bg-[#ff5500] text-white font-extrabold flex items-center justify-center text-base shadow-sm flex-shrink-0">
             5
           </span>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
             Coloca tus paredes y tu Router WIN
           </h1>
         </div>
 
         {/* Main Card Container */}
-        <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-100">
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-5 md:p-8 shadow-sm border border-slate-100 mx-1 sm:mx-0">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
@@ -520,9 +551,9 @@ export default function Paso5DisenoRouter() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left Blueprint: Shows rooms from Step 4 + Walls + Routers */}
-            <div className="lg:col-span-8 flex flex-col items-center justify-center p-3 bg-slate-50/70 rounded-2xl border border-slate-200/80 select-none">
+          <div className="flex flex-col-reverse lg:flex-row lg:gap-6 gap-4 items-start">
+            {/* Left Blueprint */}
+            <div ref={canvasContainerRef} className="lg:flex-[2] w-full flex flex-col items-center justify-center p-2 sm:p-3 bg-slate-50/70 rounded-xl sm:rounded-2xl border border-slate-200/80 select-none overflow-x-auto">
               {/* Length indicator (Top) */}
               <div className="flex items-center space-x-2 text-xs font-extrabold text-[#ff5500] mb-1.5">
                 <span>← {lengthM} m de fondo →</span>
@@ -547,7 +578,7 @@ export default function Paso5DisenoRouter() {
                     width: `${canvasW}px`,
                     height: `${canvasH}px`,
                   }}
-                  className="relative rounded-2xl border-2 border-slate-400 bg-white grid-pattern shadow-inner overflow-hidden flex-shrink-0"
+                  className="relative rounded-xl sm:rounded-2xl border-2 border-slate-400 bg-white grid-pattern shadow-inner overflow-hidden flex-shrink-0 touch-none"
                 >
                   {/* Empty warning if step 4 had no elements */}
                   {placedElements.length === 0 && (
@@ -568,19 +599,20 @@ export default function Paso5DisenoRouter() {
                         <div
                           key={el.id}
                           onMouseDown={(e) => handleMouseDown(e, el, 'element')}
+                          onTouchStart={(e) => handleMouseDown(e, el, 'element')}
                           style={{
                             left: `${el.x}px`,
                             top: `${el.y}px`,
                             width: `${el.w}px`,
                             height: `${el.h}px`,
                           }}
-                          className={`group absolute rounded-xl border-2 flex flex-col justify-between p-2 cursor-move select-none transition-shadow ${
+                          className={`group absolute rounded-lg sm:rounded-xl border-2 flex flex-col justify-between p-1 sm:p-2 cursor-move select-none transition-shadow touch-none ${
                             el.bg
                           } ${el.border} ${
                             isSel ? 'ring-2 ring-[#ff5500] shadow-md z-20' : 'shadow-xs z-10'
                           }`}
                         >
-                          <span className="font-extrabold text-xs text-slate-800 tracking-tight truncate pointer-events-none">
+                          <span className="font-extrabold text-[9px] sm:text-xs text-slate-800 tracking-tight truncate pointer-events-none">
                             {el.emoji} {el.name}
                           </span>
                           <span className="text-[10px] font-bold text-slate-400 text-center pointer-events-none">
@@ -655,6 +687,7 @@ export default function Paso5DisenoRouter() {
                       <div
                         key={wall.id}
                         onMouseDown={(e) => handleMouseDown(e, wall, 'wall')}
+                        onTouchStart={(e) => handleMouseDown(e, wall, 'wall')}
                         style={{
                           left: `${wall.x}px`,
                           top: `${wall.y}px`,
@@ -683,6 +716,7 @@ export default function Paso5DisenoRouter() {
                         <div
                           key={dev.id}
                           onMouseDown={(e) => handleMouseDown(e, dev, 'element')}
+                          onTouchStart={(e) => handleMouseDown(e, dev, 'element')}
                           style={{
                             left: `${dev.x}px`,
                             top: `${dev.y}px`,
@@ -745,7 +779,7 @@ export default function Paso5DisenoRouter() {
             </div>
 
             {/* Right: Unified, Modern & Structured Control Panel */}
-            <div className="lg:col-span-4 bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-100 flex flex-col">
+            <div className="lg:flex-1 w-full bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-100 flex flex-col">
               
               {/* Header of the unified block */}
               <div className="bg-slate-50/80 px-4 py-3 border-b border-slate-200/80 flex items-center justify-between">
@@ -976,18 +1010,18 @@ export default function Paso5DisenoRouter() {
       </div>
 
       {/* Bottom Actions */}
-      <div className="flex items-center justify-between mt-8 pb-4">
+      <div className="flex items-center justify-between mt-6 sm:mt-8 pb-4 px-2 sm:px-0 gap-2">
         <button
           type="button"
           onClick={() => navigate('/paso-4')}
-          className="px-7 py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 text-slate-600 font-bold rounded-full transition cursor-pointer text-sm"
+          className="px-4 sm:px-7 py-2.5 sm:py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-100 text-slate-600 font-bold rounded-full transition cursor-pointer text-xs sm:text-sm"
         >
           Atrás
         </button>
         <button
           type="button"
           onClick={() => navigate('/paso-6')}
-          className="inline-flex items-center space-x-2 px-9 py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-base group"
+          className="inline-flex items-center space-x-1.5 sm:space-x-2 px-5 sm:px-9 py-2.5 sm:py-3.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.98] text-white font-bold rounded-full shadow-lg shadow-[#ff5500]/25 transition duration-200 cursor-pointer text-sm sm:text-base group"
         >
           <span>Simular Cobertura</span>
           <svg
