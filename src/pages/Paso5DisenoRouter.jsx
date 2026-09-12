@@ -744,31 +744,55 @@ export default function Paso5DisenoRouter() {
               </div>
             </div>
 
-            {/* Right: Wall Generator & Router Management */}
-            <div className="lg:col-span-4 space-y-4">
-              {/* 1. Router WIN Card with Wall Snapping & Room Picker */}
-              <div className="bg-[#FFF8F5] border border-[#ff5500]/25 rounded-2xl p-4 shadow-sm space-y-3">
+            {/* Right: Unified, Modern & Structured Control Panel */}
+            <div className="lg:col-span-4 bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-100 flex flex-col">
+              
+              {/* Header of the unified block */}
+              <div className="bg-slate-50/80 px-4 py-3 border-b border-slate-200/80 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#ff5500]"></span>
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+                    Herramientas de Instalación
+                  </span>
+                </div>
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  Paso 5
+                </span>
+              </div>
+
+              {/* SECTION 1: Router WIN (Ubicación en Pared) */}
+              <div className="p-4 space-y-3 bg-[#FFFBF9]">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-slate-900 text-sm flex items-center space-x-1.5">
-                    <span>📡</span>
-                    <span>Router Fibra WIN</span>
-                  </h3>
-                  <span className="text-[11px] font-extrabold px-2 py-0.5 bg-[#ff5500] text-white rounded-full">
-                    {routerDevice ? '1 en pared' : 'Pendiente'}
+                  <div className="flex items-center space-x-2">
+                    <span className="text-base">📡</span>
+                    <div>
+                      <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm">
+                        Router WIN Fibra
+                      </h3>
+                      <p className="text-[11px] text-slate-500 leading-tight">
+                        Adherido automáticamente a la pared
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full transition-colors ${
+                      routerDevice
+                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                        : 'bg-amber-100 text-amber-800 border border-amber-300'
+                    }`}
+                  >
+                    {routerDevice ? '✓ En pared' : 'Pendiente'}
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-600">
-                  {routerDevice
-                    ? `Tu router está encajado en la pared de ${routerDevice.roomName || 'la habitación'}. Al arrastrarlo se adherirá automáticamente a la pared más próxima.`
-                    : 'Coloca tu router en una pared de la habitación principal para maximizar la cobertura.'}
-                </p>
-
                 {routerDevice ? (
-                  <div className="bg-white/80 border border-[#ff5500]/30 rounded-xl p-2.5 text-xs text-slate-700 flex items-center justify-between">
-                    <span className="font-semibold truncate">
-                      📍 {routerDevice.snappedWall || `Pared de ${routerDevice.roomName}`}
-                    </span>
+                  <div className="bg-white border border-[#ff5500]/30 rounded-xl p-2.5 shadow-2xs flex items-center justify-between">
+                    <div className="flex items-center space-x-2 truncate">
+                      <span className="text-[#ff5500] font-black text-xs">📍</span>
+                      <span className="text-xs font-bold text-slate-800 truncate">
+                        {routerDevice.snappedWall || `Pared de ${routerDevice.roomName || 'Habitación'}`}
+                      </span>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
@@ -776,7 +800,7 @@ export default function Paso5DisenoRouter() {
                         setSelectedElementId(null);
                         showFeedback('Router retirado del plano');
                       }}
-                      className="text-rose-500 hover:text-rose-700 text-xs font-bold ml-2 cursor-pointer"
+                      className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-2 py-1 rounded-lg text-xs font-bold cursor-pointer transition"
                       title="Quitar router"
                     >
                       Quitar ✕
@@ -786,148 +810,165 @@ export default function Paso5DisenoRouter() {
                   <button
                     type="button"
                     onClick={() => handleAddRouter()}
-                    className="w-full py-2.5 bg-[#ff5500] hover:bg-[#e64d00] text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center space-x-1.5 shadow-md shadow-[#ff5500]/20"
+                    className="w-full py-2.5 bg-[#ff5500] hover:bg-[#e64d00] active:scale-[0.99] text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center space-x-2 shadow-sm shadow-[#ff5500]/25"
                   >
                     <span>+ Colocar Router WIN en pared</span>
                   </button>
                 )}
 
-                {/* Quick Room Placement Buttons */}
+                {/* Ubicación rápida en habitación */}
                 {rooms.length > 0 && (
-                  <div className="pt-2 border-t border-[#ff5500]/15 space-y-1.5">
-                    <span className="text-[11px] font-bold text-slate-600 block">
-                      📍 Ubicar router directamente en pared de:
+                  <div className="pt-2 border-t border-[#ff5500]/10">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                      Fijar rápido en ambiente:
                     </span>
                     <div className="flex flex-wrap gap-1.5">
-                      {rooms.map((room) => (
-                        <button
-                          key={room.id}
-                          type="button"
-                          onClick={() => handleAddRouter(room)}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer flex items-center space-x-1 ${
-                            routerDevice?.roomName === room.name
-                              ? 'bg-[#ff5500] text-white border-[#ff5500]'
-                              : 'bg-white text-slate-700 border-slate-200 hover:border-[#ff5500]'
-                          }`}
-                        >
-                          <span>{room.emoji}</span>
-                          <span>{room.name}</span>
-                        </button>
-                      ))}
+                      {rooms.map((room) => {
+                        const isCurrentRoom = routerDevice?.roomName === room.name;
+                        return (
+                          <button
+                            key={room.id}
+                            type="button"
+                            onClick={() => handleAddRouter(room)}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer flex items-center space-x-1 ${
+                              isCurrentRoom
+                                ? 'bg-[#ff5500] text-white border-[#ff5500] shadow-2xs'
+                                : 'bg-white text-slate-700 border-slate-200 hover:border-[#ff5500] hover:bg-amber-50/50'
+                            }`}
+                          >
+                            <span>{room.emoji}</span>
+                            <span>{room.name}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Add Walls Tool */}
-              <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm flex items-center space-x-1.5">
-                    <span>🧱</span>
-                    <span>Añadir Paredes / Muros</span>
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Las paredes atenúan la señal Wi-Fi. Dibuja las divisiones de tu casa:
-                  </p>
-                </div>
-
-                {/* Wall Material Selection */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Material de la pared
-                  </label>
-                  <div className="space-y-1.5">
-                    {WALL_MATERIALS.map((mat) => {
-                      const isSel = selectedWallMaterial === mat.id;
-                      return (
-                        <div
-                          key={mat.id}
-                          onClick={() => setSelectedWallMaterial(mat.id)}
-                          className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition text-xs ${
-                            isSel
-                              ? 'border-[#ff5500] bg-white ring-2 ring-[#ff5500]/20 shadow-xs'
-                              : 'border-slate-200 bg-white/70 hover:bg-white'
-                          }`}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <span className="text-base">{mat.icon}</span>
-                            <span className="font-bold text-slate-800">{mat.name}</span>
-                          </div>
-                          <span className={`w-3.5 h-3.5 rounded-full ${mat.color}`}></span>
-                        </div>
-                      );
-                    })}
+              {/* SECTION 2: Material de Paredes */}
+              <div className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-base">🧱</span>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-xs">
+                        Material de Paredes
+                      </h4>
+                      <p className="text-[11px] text-slate-500">
+                        Nivel de impacto en la señal Wi-Fi
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Wall Orientation */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Orientación
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
+                  {WALL_MATERIALS.map((mat) => {
+                    const isSel = selectedWallMaterial === mat.id;
+                    return (
+                      <button
+                        key={mat.id}
+                        type="button"
+                        onClick={() => setSelectedWallMaterial(mat.id)}
+                        className={`p-2 rounded-xl border text-left flex flex-col justify-between transition cursor-pointer ${
+                          isSel
+                            ? 'border-[#ff5500] bg-orange-50/40 ring-1 ring-[#ff5500] shadow-2xs'
+                            : 'border-slate-200 hover:border-slate-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full mb-1">
+                          <span className="text-base leading-none">{mat.icon}</span>
+                          <span className={`w-2.5 h-2.5 rounded-full ${mat.color}`} />
+                        </div>
+                        <div>
+                          <span className="font-bold text-[11px] text-slate-900 block leading-tight">
+                            {mat.name.split(' / ')[0]}
+                          </span>
+                          <span className="text-[9px] text-slate-400 font-medium block mt-0.5">
+                            {mat.id === 'concreto' ? '-12 dB' : mat.id === 'drywall' ? '-6 dB' : '-3 dB'}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* SECTION 3: Formas de agregar paredes */}
+              <div className="p-4 space-y-3 bg-slate-50/40">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    Colocar Paredes
+                  </span>
+                  <span className="text-[10px] font-bold text-[#ff5500]">
+                    Total: {placedWalls.length}
+                  </span>
+                </div>
+
+                {/* 1-Click Fast Recommendation */}
+                {placedElements.filter((el) => el.type === 'room').length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleAutoBorderRooms}
+                    className="w-full py-2.5 px-3 bg-white border border-[#ff5500] hover:bg-[#ff5500] text-[#ff5500] hover:text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center space-x-2 shadow-2xs group"
+                  >
+                    <span className="group-hover:scale-110 transition-transform">⚡</span>
+                    <span>Paredes a todas las habitaciones (1 clic)</span>
+                  </button>
+                )}
+
+                {/* Manual Wall Addition */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="flex rounded-xl bg-slate-200/80 p-0.5 border border-slate-200">
                     <button
                       type="button"
                       onClick={() => setWallOrientation('horizontal')}
-                      className={`py-2 rounded-xl text-xs font-bold transition border cursor-pointer ${
+                      className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer text-center ${
                         wallOrientation === 'horizontal'
-                          ? 'border-[#ff5500] bg-[#FFF8F5] text-[#ff5500]'
-                          : 'border-slate-200 bg-white text-slate-600'
+                          ? 'bg-white text-[#ff5500] shadow-2xs'
+                          : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Horizontal ━
+                      Horiz. ━
                     </button>
                     <button
                       type="button"
                       onClick={() => setWallOrientation('vertical')}
-                      className={`py-2 rounded-xl text-xs font-bold transition border cursor-pointer ${
+                      className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer text-center ${
                         wallOrientation === 'vertical'
-                          ? 'border-[#ff5500] bg-[#FFF8F5] text-[#ff5500]'
-                          : 'border-slate-200 bg-white text-slate-600'
+                          ? 'bg-white text-[#ff5500] shadow-2xs'
+                          : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Vertical ┃
+                      Vert. ┃
                     </button>
                   </div>
-                </div>
 
-                {/* Add Wall Button */}
-                <div className="space-y-2">
                   <button
                     type="button"
                     onClick={handleAddWall}
-                    className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center space-x-1.5 shadow-sm"
+                    className="py-1.5 px-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center space-x-1 shadow-2xs"
                   >
-                    <span>+ Agregar pared individual</span>
+                    <span>+ Añadir libre</span>
                   </button>
-
-                  {placedElements.filter((el) => el.type === 'room').length > 0 && (
-                    <button
-                      type="button"
-                      onClick={handleAutoBorderRooms}
-                      className="w-full py-2 bg-[#FFF8F5] border border-[#ff5500] hover:bg-[#ff5500] text-[#ff5500] hover:text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center space-x-1.5"
-                    >
-                      <span>⚡ Paredes a todas las habitaciones (1 clic)</span>
-                    </button>
-                  )}
                 </div>
 
-                {/* Direct 1-Click Instructions */}
-                <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-3 text-[11px] text-amber-800 space-y-1">
-                  <div className="font-bold flex items-center space-x-1">
-                    <span>👆</span>
-                    <span>1 solo clic en el borde:</span>
-                  </div>
-                  <p>
-                    Pasa el cursor sobre cualquier borde de una habitación en el plano y haz clic en <b>+ pared</b> para ponerla o quitarla al instante.
+                {/* Quick Hint Banner */}
+                <div className="bg-amber-50/90 border border-amber-200/80 rounded-xl p-2.5 flex items-start space-x-2 text-[11px] text-amber-900">
+                  <span className="text-xs mt-0.5">👆</span>
+                  <p className="leading-snug">
+                    <b>Tip directo:</b> Pasa el cursor por cualquier borde de una habitación en el plano y haz clic en <b>+ pared</b> para ponerla o quitarla al instante.
                   </p>
                 </div>
+              </div>
 
-                {/* Wall count summary */}
-                <div className="pt-2 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
-                  <span>Paredes agregadas:</span>
-                  <span className="font-extrabold text-slate-900">{placedWalls.length}</span>
-                </div>
+              {/* Panel Footer / Quick Stats */}
+              <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-500">
+                <span className="flex items-center space-x-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span>Ambientes: <b>{rooms.length}</b></span>
+                </span>
+                <span>Paredes: <b className="text-slate-800">{placedWalls.length}</b></span>
               </div>
             </div>
           </div>
